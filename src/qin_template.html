@@ -1,0 +1,1091 @@
+<title>百二秦关 · 为什么吞并六国的是秦</title>
+<style>
+:root{
+  --bg:#14171d; --panel:#1d222b; --panel-2:#232a35; --ink:#eae4d6; --ink-2:#a89e8e; --ink-3:#7a7264;
+  --line:#333a46; --accent:#d05a35; --accent-dim:#a3492e; --indigo:#6d9dd4; --gold:#d4a94f; --green:#8fae62;
+  --chip:#2a313d; --shadow:0 10px 30px rgba(0,0,0,.45); --map-bg:#151f2b;
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#ece5d4; --panel:#f7f2e6; --panel-2:#efe8d7; --ink:#2b251b; --ink-2:#6d6350; --ink-3:#988c74;
+    --line:#d6cbb4; --accent:#a83a1e; --accent-dim:#c2593c; --indigo:#38659e; --gold:#9b7826; --green:#5f7f38;
+    --chip:#e6dec9; --shadow:0 10px 24px rgba(90,70,40,.18); --map-bg:#c6bda6; }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --panel:#1d222b; --panel-2:#232a35; --ink:#eae4d6; --ink-2:#a89e8e; --ink-3:#7a7264;
+  --line:#333a46; --accent:#d05a35; --accent-dim:#a3492e; --indigo:#6d9dd4; --gold:#d4a94f; --green:#8fae62;
+  --chip:#2a313d; --shadow:0 10px 30px rgba(0,0,0,.45); --map-bg:#151f2b;
+}
+:root[data-theme="light"]{
+  --bg:#ece5d4; --panel:#f7f2e6; --panel-2:#efe8d7; --ink:#2b251b; --ink-2:#6d6350; --ink-3:#988c74;
+  --line:#d6cbb4; --accent:#a83a1e; --accent-dim:#c2593c; --indigo:#38659e; --gold:#9b7826; --green:#5f7f38;
+  --chip:#e6dec9; --shadow:0 10px 24px rgba(90,70,40,.18); --map-bg:#c6bda6;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  font-size:14px;line-height:1.7;overflow:hidden}
+
+#app{display:flex;flex-direction:column;height:100vh}
+header{display:flex;align-items:baseline;gap:14px;padding:10px 18px 9px;border-bottom:1px solid var(--line);flex:none}
+.seal-mark{width:30px;height:30px;flex:none;align-self:center;border-radius:6px;background:var(--accent);
+  color:#f5ead9;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;
+  font-family:"Songti SC","Noto Serif SC",serif;box-shadow:inset 0 0 0 2px rgba(245,234,217,.55), inset 0 0 0 3.5px var(--accent)}
+h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.06em;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+h1 small{font-weight:400;color:var(--ink-2);font-size:13px;letter-spacing:.02em;margin-left:10px}
+#main{display:flex;flex:1;min-height:0}
+#mapwrap{position:relative;flex:1;min-width:0;background:var(--map-bg)}
+canvas#map,canvas#ovl{position:absolute;inset:0;width:100%;height:100%;display:block}
+#ovl{cursor:grab}
+#ovl.grabbing{cursor:grabbing} #ovl.pick{cursor:crosshair}
+
+.mapchip{position:absolute;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(4px);
+  border:1px solid var(--line);border-radius:7px;padding:4px 10px;font-size:12px;color:var(--ink-2);pointer-events:none}
+#readout{right:12px;bottom:12px;font-variant-numeric:tabular-nums;min-width:200px;text-align:right}
+#readout b{color:var(--ink);font-weight:600}
+#attrib{left:12px;bottom:12px;font-size:10.5px;color:var(--ink-3)}
+#scalebar{left:12px;bottom:38px;padding:3px 10px 5px}
+#scalebar .bar{height:4px;border:1.5px solid var(--ink-2);border-top:none;margin-top:2px}
+#zoomctl{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+#zoomctl button{width:32px;height:32px;border-radius:7px;border:1px solid var(--line);background:var(--panel);
+  color:var(--ink);font-size:16px;cursor:pointer;box-shadow:var(--shadow)}
+#zoomctl button:hover{background:var(--panel-2)}
+
+#panel{width:400px;flex:none;border-left:1px solid var(--line);background:var(--panel);overflow-y:auto;overscroll-behavior:contain}
+.sec{padding:14px 18px;border-bottom:1px solid var(--line)}
+.sec h2{font-size:11.5px;margin:0 0 10px;color:var(--ink-3);font-weight:600;letter-spacing:.22em;text-transform:uppercase}
+
+#steps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+#steps button{border:1px solid var(--line);background:var(--chip);color:var(--ink-2);border-radius:99px;
+  padding:4px 12px 5px;font-size:12.5px;cursor:pointer;letter-spacing:.03em}
+#steps button.on{background:var(--accent);border-color:var(--accent);color:#f7efe2;font-weight:600}
+#steps button:hover:not(.on){color:var(--ink)}
+#story h3{font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:19px;margin:2px 0 8px;letter-spacing:.03em;text-wrap:balance}
+#story p{margin:0 0 8px;color:var(--ink);font-size:13.5px;line-height:1.95;text-align:justify;
+  font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+#story p b{color:var(--accent);font-weight:700}
+#story p i{font-style:normal;color:var(--gold);font-weight:600}
+#story .hint{font-family:inherit;font-size:12px;color:var(--ink-3);border-left:2px solid var(--line);padding-left:9px;line-height:1.7}
+.navrow{display:flex;gap:8px;margin-top:12px}
+.navrow button{flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--line);background:var(--chip);
+  color:var(--ink);cursor:pointer;font-size:13px}
+.navrow button:hover{background:var(--panel-2)}
+.navrow button.primary{background:var(--accent);border-color:var(--accent);color:#f7efe2;font-weight:600}
+.navrow button:disabled{opacity:.35;cursor:default}
+
+.lay{display:flex;align-items:center;gap:9px;padding:3.5px 0;cursor:pointer;user-select:none}
+.lay input{accent-color:var(--accent);width:15px;height:15px;margin:0;flex:none}
+.lay .sw{width:14px;height:14px;border-radius:4px;flex:none}
+.lay span{font-size:13px}
+#thres{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);flex-wrap:wrap}
+#thres input{flex:1;accent-color:var(--gold);min-width:120px}
+#thres label{font-size:12px;color:var(--ink-2);white-space:nowrap}
+#thres b{font-variant-numeric:tabular-nums;color:var(--gold)}
+.seedbtns{display:flex;gap:6px}
+.seedbtns button{border:1px solid var(--line);background:var(--chip);color:var(--ink-2);border-radius:7px;
+  padding:3px 10px;font-size:12px;cursor:pointer}
+.seedbtns button.on{border-color:var(--gold);color:var(--gold);font-weight:600;background:transparent}
+
+.profbtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.profbtns button{border:1px solid var(--line);background:var(--chip);color:var(--ink-2);border-radius:7px;
+  padding:5px 10px;font-size:12px;cursor:pointer}
+.profbtns button.on{border-color:var(--accent);color:var(--accent);font-weight:600;background:transparent}
+.profbtns button:hover:not(.on){color:var(--ink)}
+#profchart{width:100%;height:150px;display:block;border:1px solid var(--line);border-radius:8px;background:var(--panel-2)}
+#profstats{font-size:12px;color:var(--ink-2);margin-top:7px;font-variant-numeric:tabular-nums;min-height:18px}
+#profstats b{color:var(--ink)}
+
+#legend canvas{width:100%;height:14px;border-radius:4px;display:block}
+#legend .ticks{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-top:3px;font-variant-numeric:tabular-nums}
+.src{font-size:11px;color:var(--ink-3);line-height:1.8}
+
+.seals{display:flex;gap:60px;justify-content:center;margin:14px 0 34px}
+.seal{width:74px;height:74px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-family:"Songti SC","Noto Serif SC",serif;font-size:24px;font-weight:800;letter-spacing:2px;
+  writing-mode:vertical-rl;text-orientation:upright;position:relative}
+.seal.jun{background:transparent;color:var(--gold);border:2.5px solid var(--gold)}
+.seal.gong{background:var(--accent);color:#f5ead9;box-shadow:inset 0 0 0 2.5px rgba(245,234,217,.6)}
+.seal em{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);writing-mode:horizontal-tb;
+  font-style:normal;font-size:11px;color:var(--ink-3);white-space:nowrap;letter-spacing:.1em}
+
+@media (max-width: 880px){
+  body{overflow:auto}
+  #app{height:auto}
+  #main{flex-direction:column}
+  #mapwrap{height:min(62vh, 96vw);flex:none}
+  #panel{width:100%;border-left:none;border-top:1px solid var(--line)}
+  #readout{display:none}
+  #attrib{max-width:calc(100% - 24px);font-size:9.5px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none !important;transition:none !important} }
+</style>
+
+<div id="app">
+<header>
+  <div class="seal-mark">秦</div>
+  <h1>百二秦关<small>为什么吞并六国的是秦 —— 一张战国地形图的战略课</small></h1>
+</header>
+<div id="main">
+  <div id="mapwrap">
+    <canvas id="map"></canvas>
+    <canvas id="ovl"></canvas>
+    <div id="zoomctl">
+      <button id="zin" title="放大">＋</button>
+      <button id="zout" title="缩小">－</button>
+      <button id="zfit" title="复位视图" style="font-size:13px">⌂</button>
+    </div>
+    <div class="mapchip" id="scalebar"><span id="sblabel">100 km</span><div class="bar" id="sbbar"></div></div>
+    <div class="mapchip" id="attrib">地形 Mapzen/AWS Terrain Tiles · 河流 Natural Earth · 疆域约前262年·概略示意</div>
+    <div class="mapchip" id="readout">移动鼠标读取海拔</div>
+  </div>
+  <div id="panel">
+    <div class="sec" id="storysec">
+      <h2>六步看懂 · SIX STEPS</h2>
+      <div id="steps"></div>
+      <div id="story"></div>
+      <div class="navrow">
+        <button id="prev">← 上一步</button>
+        <button id="next" class="primary">下一步 →</button>
+      </div>
+    </div>
+    <div class="sec">
+      <h2>图层 · LAYERS</h2>
+      <div id="layers"></div>
+      <div id="thres">
+        <label>通行海拔上限 <b id="tval">700 m</b></label>
+        <input type="range" id="tslider" min="400" max="2000" step="50" value="700">
+        <div class="seedbtns">
+          <button id="seedQ" class="on">出发点：咸阳</button>
+          <button id="seedW">大梁</button>
+        </div>
+      </div>
+    </div>
+    <div class="sec">
+      <h2>地形剖面 · PROFILE</h2>
+      <div class="profbtns">
+        <button id="pfA">咸阳 → 大梁 · 函谷道</button>
+        <button id="pfB">咸阳 → 郢 · 武关道</button>
+        <button id="pfC">自选两点</button>
+      </div>
+      <canvas id="profchart"></canvas>
+      <div id="profstats">选择一条剖面线：出关是顺坡，入关是仰攻。</div>
+    </div>
+    <div class="sec" id="legend">
+      <h2>海拔 · ELEVATION</h2>
+      <canvas id="legcv"></canvas>
+      <div class="ticks"><span>海</span><span>0</span><span>200</span><span>500</span><span>1000</span><span>2000</span><span>4000</span><span>6000 m</span></div>
+    </div>
+    <div class="sec src">
+      高程：Mapzen Terrain Tiles（AWS 开放数据，约 1.9 km/像素）· 河流：Natural Earth（标注用先秦古称）·
+      七国疆域为约公元前262年（长平之战前夕）的<b>概略示意</b>，界线不精确 ·
+      史实以《史记》《战国策》《华阳国志》《资治通鉴》等为据（斩首/兵力数字均出《史记》，学界对其真实性存不同估计），进军路线为概略复原。
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+"use strict";
+/* ================= data ================= */
+const META = __META__;
+const HEIGHT_B64 = "__HEIGHT_B64__";
+const RIVERS = __RIVERS__;
+const RIVER_CN = {Yellow:"河水", Yangtze:"江水", Wei:"渭水", Jing:"泾水", Fen:"汾水", Han:"汉水",
+  Huai:"淮水", Jialing:"嘉陵江", Min:"岷江", Xiang:"湘水", Zhang:"漳水", Liao:"辽水", Luan:"濡水"};
+
+/* ---------- geo helpers ---------- */
+const mercX = lon => (lon + 180) / 360;
+const mercY = lat => { const r = lat * Math.PI / 180; return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2; };
+const MX0 = mercX(META.lonMin), MX1 = mercX(META.lonMax);
+const MY0 = mercY(META.latMax), MY1 = mercY(META.latMin);
+const W = META.width, H = META.height;
+const geoToImg = (lon, lat) => [ (mercX(lon)-MX0)/(MX1-MX0)*W, (mercY(lat)-MY0)/(MY1-MY0)*H ];
+const imgToGeo = (x, y) => {
+  const lon = (x/W)*(MX1-MX0)*360 + (MX0*360 - 180);
+  const my = MY0 + (y/H)*(MY1-MY0);
+  return [lon, Math.atan(Math.sinh(Math.PI*(1-2*my))) * 180/Math.PI];
+};
+const havKm = (a, b) => {
+  const R=6371, d=Math.PI/180;
+  const dLa=(b[1]-a[1])*d, dLo=(b[0]-a[0])*d;
+  const s=Math.sin(dLa/2)**2 + Math.cos(a[1]*d)*Math.cos(b[1]*d)*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(s));
+};
+
+/* ---------- elevation ramp (region reaches ~5900m) ---------- */
+const RAMP = [
+  [-800,[26,44,66]], [-200,[38,64,92]], [-60,[62,96,126]], [-8,[104,140,163]], [0,[136,167,181]],
+  [1,[104,140,96]], [60,[126,158,104]], [200,[164,180,116]], [450,[199,186,131]],
+  [800,[188,153,104]], [1400,[160,116,84]], [2200,[136,96,84]], [3200,[176,164,158]],
+  [4500,[228,226,224]], [7200,[255,255,255]]
+];
+function rampColor(h){
+  if (h <= RAMP[0][0]) return RAMP[0][1];
+  for (let i=1;i<RAMP.length;i++){
+    if (h <= RAMP[i][0]){
+      const [h0,c0]=RAMP[i-1],[h1,c1]=RAMP[i], t=(h-h0)/(h1-h0);
+      return [c0[0]+(c1[0]-c0[0])*t, c0[1]+(c1[1]-c0[1])*t, c0[2]+(c1[2]-c0[2])*t];
+    }
+  }
+  return RAMP[RAMP.length-1][1];
+}
+
+/* ---------- state ---------- */
+let heights = null;
+const baseCv = document.createElement('canvas');  baseCv.width=W; baseCv.height=H;
+const reachCv = document.createElement('canvas'); reachCv.width=W; reachCv.height=H;
+const terrCv = document.createElement('canvas');  terrCv.width=W; terrCv.height=H;
+let thresholdM = 700;
+let seedName = "xianyang";
+const SEEDS = { xianyang:[108.9,34.4], daliang:[114.31,34.80] };
+
+const layers = {
+  terr:   {on:true,  name:"七国疆域（约前262年·示意）", sw:"#b0483f"},
+  passes: {on:true,  name:"险塞与通道", sw:"#c86a4a"},
+  rivers: {on:true,  name:"江河（古称）", sw:"#6d9dd4"},
+  cities: {on:true,  name:"城邑", sw:"#e0d6c2"},
+  battles:{on:false, name:"决定性战役（前316–前260）", sw:"#d05a35"},
+  diplo:  {on:false, name:"远交近攻（前266）", sw:"#d4a94f"},
+  routes: {on:false, name:"灭六国（前230–前221）", sw:"#d05a35"},
+  water:  {on:false, name:"水利工程", sw:"#8fae62"},
+  reach:  {on:false, name:"低地可达区（金色）", sw:"#d4a94f"},
+};
+
+/* ---------- Warring States territories (c. 262 BC, schematic) ---------- */
+const STATES = [
+ {n:"秦", c:[64,64,74], lab:[106.8,34.0], labc:"#565664", poly:[
+   [103.5,35.7],[104.5,37.0],[107.0,38.4],[109.5,38.6],[110.5,38.0],[110.6,36.5],[110.8,35.4],
+   [111.5,35.0],[112.2,35.2],[112.0,34.8],[112.3,34.4],[111.8,33.9],[112.6,33.6],[113.15,33.3],
+   [113.2,32.5],[112.9,31.8],[113.0,30.7],[112.5,29.8],[111.0,29.5],[109.5,29.0],[107.5,28.6],[105.8,27.9],
+   [104.2,28.4],[103.2,29.4],[102.9,31.0],[104.0,32.8],[105.0,34.2],[103.5,35.7]]},
+ {n:"韩", c:[200,166,62], lab:[113.2,34.05], labc:"#8a6d1c", poly:[
+   [112.3,34.4],[112.0,34.8],[113.2,34.9],[113.8,34.7],[114.2,34.2],[113.9,33.6],
+   [112.6,33.6],[111.8,33.9],[112.3,34.4]]},
+ {n:"魏", c:[79,138,79], lab:[114.9,35.35], labc:"#2f6b2f", poly:[
+   [113.2,34.9],[113.6,35.4],[114.5,35.9],[115.5,36.1],[116.0,35.7],[116.2,35.0],[115.8,34.4],
+   [115.0,34.0],[114.2,34.2],[113.8,34.7],[113.2,34.9]]},
+ {n:"赵", c:[181,118,47], lab:[113.4,38.6], labc:"#8a5a1e", poly:[
+   [110.5,38.0],[109.8,39.4],[109.8,40.7],[111.7,41.2],[113.5,41.3],[115.0,41.0],[116.2,40.6],
+   [115.5,39.8],[114.7,39.0],[115.3,38.3],[115.8,37.5],[115.4,36.6],[114.8,36.2],[113.8,36.3],
+   [113.0,36.5],[112.8,35.9],[112.4,35.6],[112.0,36.2],[112.0,37.2],
+   [111.9,38.2],[111.0,38.9],[110.6,38.6],[110.5,38.0]]},
+ {n:"燕", c:[63,127,174], lab:[118.6,41.0], labc:"#26567c", poly:[
+   [116.2,40.6],[117.0,42.0],[119.5,42.3],[121.5,42.2],[123.3,42.5],[124.5,42.0],[124.5,40.0],
+   [123.0,39.5],[122.0,39.0],[121.2,39.8],[119.8,39.9],[118.5,39.3],[117.2,39.0],[116.5,38.7],
+   [115.5,38.6],[115.3,38.3],[114.7,39.0],[115.5,39.8],[116.2,40.6]]},
+ {n:"齐", c:[128,88,168], lab:[119.6,36.9], labc:"#5b3d80", poly:[
+   [116.2,37.5],[116.5,38.0],[117.5,38.5],[118.2,38.2],[119.0,37.8],[120.5,37.9],[122.3,37.6],
+   [122.5,37.0],[121.0,36.4],[119.8,35.8],[119.3,35.0],[118.0,34.9],[117.5,35.3],[117.0,35.9],
+   [116.4,36.3],[116.2,36.9],[116.2,37.5]]},
+ {n:"鲁", small:1, c:[128,124,116], lab:[117.0,35.62], labc:"#6a6458", poly:[
+   [116.6,35.95],[117.35,35.9],[117.5,35.5],[117.1,35.2],[116.6,35.45],[116.6,35.95]]},
+ {n:"陶（秦飞地）", small:1, c:[64,64,74], lab:[115.62,35.12], labc:"#565664", poly:[
+   [115.35,35.3],[115.85,35.32],[115.92,34.95],[115.42,34.92],[115.35,35.3]]},
+ {n:"周", small:1, c:[148,120,88], lab:[112.46,34.78], labc:"#7a6248", poly:[
+   [112.25,34.82],[112.68,34.82],[112.72,34.5],[112.28,34.5],[112.25,34.82]]},
+ {n:"楚", c:[176,72,63], lab:[115.6,31.4], labc:"#93362c", poly:[
+   [113.9,33.6],[114.2,34.2],[115.0,34.0],[115.8,34.4],[116.2,35.0],[117.2,35.4],[118.0,34.9],
+   [119.3,35.0],[119.6,34.5],[120.3,33.5],[120.8,32.2],[121.5,31.3],[121.0,30.2],[120.6,29.9],
+   [121.8,29.3],[120.9,28.4],[119.5,27.8],[118.0,27.5],[116.5,27.8],[115.0,27.0],[113.5,26.0],
+   [112.5,25.5],[111.0,25.8],[110.0,26.8],[109.5,28.0],[109.5,29.0],[111.0,29.5],[112.5,29.8],
+   [113.0,30.7],[112.9,31.8],[113.2,32.5],[113.15,33.3],[113.9,33.6]]},
+];
+
+/* ---------- passes / annotations ---------- */
+const PASSES = [
+  {n:"函谷关", g:[110.87,34.62]}, {n:"武关", g:[110.59,33.63]},
+  {n:"大散关", g:[107.00,34.24]}, {n:"萧关", g:[106.22,36.02]},
+  {n:"井陉", g:[114.14,38.03]}, {n:"剑门（金牛道）", g:[105.57,32.29]},
+];
+const XIAOHAN = {a:[110.9,34.66], b:[112.35,34.6], label:"崤函通道"};
+const WATERWORKS = [
+  {n:"都江堰 · 约前256", g:[103.62,31.00]},
+  {n:"郑国渠 · 前246", g:[109.15,34.68], line:[[108.84,34.60],[109.50,34.72],[110.05,34.66]]},
+];
+
+/* ---------- cities ---------- */
+const CITIES = [
+  {n:"咸阳", g:[108.71,34.33], cap:1},
+  {n:"洛邑（周）", g:[112.45,34.62]},
+  {n:"新郑（韩）", g:[113.74,34.40], cap:1},
+  {n:"大梁（魏）", g:[114.31,34.80], cap:1},
+  {n:"邯郸（赵）", g:[114.54,36.63], cap:1},
+  {n:"晋阳", g:[112.55,37.87]},
+  {n:"蓟（燕）", g:[116.40,39.90], cap:1},
+  {n:"襄平（辽阳）", g:[123.18,41.27]},
+  {n:"临淄（齐）", g:[118.31,36.83], cap:1},
+  {n:"即墨（故城）", g:[120.10,36.62]},
+  {n:"陈（楚都·前278后）", g:[114.88,33.74], cap:1},
+  {n:"寿春", g:[116.79,32.63]},
+  {n:"吴", g:[120.62,31.32]},
+  {n:"郢（江陵）", g:[112.19,30.33]},
+  {n:"宛", g:[112.53,33.00]},
+  {n:"汉中", g:[107.03,33.07]},
+  {n:"成都", g:[104.07,30.66]},
+  {n:"江州（重庆）", g:[106.55,29.56]},
+  {n:"上党", g:[113.11,36.19]},
+  {n:"安邑", g:[111.22,35.09]},
+  {n:"曲阜（鲁）", g:[116.99,35.60]},
+];
+
+/* ---------- terrain labels ---------- */
+const TERRA = [
+  ["秦岭",107.9,33.60,-6,15,"mtn"], ["崤山",111.35,34.35,-28,12,"mtn"],
+  ["太行山",113.45,37.30,-70,15,"mtn"], ["吕梁山",111.25,37.90,-76,13,"mtn"],
+  ["陇山",106.30,35.10,-80,12,"mtn"], ["岷山",103.55,32.60,-65,13,"mtn"],
+  ["大巴山",108.30,32.15,-14,13,"mtn"], ["巫山",110.05,30.95,-60,12,"mtn"],
+  ["大别山",115.55,31.35,-32,12,"mtn"], ["燕山",117.20,40.70,-6,13,"mtn"],
+  ["泰山",117.10,36.25,0,12,"mtn"],
+  ["黄土高原",108.6,36.9,0,14,"reg"], ["青藏高原东缘",101.3,33.5,-80,13,"reg"],
+  ["关中平原",108.5,34.45,-12,12,"plain"], ["华北平原",115.4,35.9,0,16,"plain"],
+  ["成都平原",103.95,30.75,-40,12,"plain"], ["江汉平原",112.75,30.45,0,12,"plain"],
+  ["渤海",119.6,38.7,0,14,"sea"], ["黄海",121.6,35.3,0,14,"sea"],
+  ["河水（黄河）",110.55,36.9,-84,12,"riv"], ["渭水",107.5,34.42,-6,12,"riv"],
+  ["汾水",111.65,36.6,-68,11,"riv"], ["汉水",111.2,32.65,-35,12,"riv"],
+  ["江水（长江）",117.6,30.55,-18,12,"riv"], ["淮水",115.9,32.55,-8,11,"riv"],
+];
+
+/* ---------- battles & routes ---------- */
+const BATTLES = [
+  {n:"伊阙之战 · 前293 · 斩韩魏联军24万", g:[112.47,34.55]},
+  {n:"鄢郢之战 · 前279–278 · 楚失故都", g:[112.19,30.45]},
+  {n:"长平之战 · 前260 · 赵卒约45万尽没", g:[112.87,35.79]},
+];
+const R_SHU = { name:"司马错灭蜀 · 前316 · 金牛道",
+  pts:[[108.71,34.33],[107.2,34.1],[106.9,33.4],[106.2,33.1],[105.8,32.4],[105.4,32.1],[104.7,31.5],[104.07,30.66]] };
+const CONQ = [
+  {num:"①", yr:"前230 灭韩", pts:[[108.71,34.33],[110.87,34.62],[112.2,34.55],[113.1,34.45],[113.74,34.40]]},
+  {num:"②", yr:"前228 破赵", pts:[[110.87,34.62],[111.9,35.1],[112.9,35.8],[113.7,36.3],[114.54,36.63]]},
+  {num:"③", yr:"前225 灭魏", pts:[[112.2,34.55],[113.2,34.7],[114.31,34.80]]},
+  {num:"④", yr:"前223 灭楚", pts:[[113.1,34.45],[114.3,33.9],[114.88,33.74],[115.7,33.1],[116.79,32.63],[118.0,31.6]]},
+  {num:"⑤", yr:"前226/222 灭燕", pts:[[114.54,36.63],[115.7,38.2],[116.40,39.90],[118.6,40.4],[121.2,41.2],[123.18,41.27]]},
+  {num:"⑥", yr:"前221 灭齐", pts:[[116.40,39.90],[116.9,38.5],[117.6,37.5],[118.31,36.83]]},
+];
+const DIPLO = {
+  near:[ {t:"近攻", pts:[[108.9,34.4],[113.5,34.45]]}, {t:"", pts:[[108.9,34.5],[114.1,34.85]]}, {t:"", pts:[[108.9,34.6],[113.9,36.4]]} ],
+  far:[ {t:"远交 · 重金结好", pts:[[109.2,34.8],[113.5,36.9],[118.31,36.83]]}, {t:"", pts:[[109.0,34.9],[112.5,38.5],[116.40,39.90]]} ],
+};
+
+/* ---------- story ---------- */
+const STEPS = [
+ {t:"棋盘：七雄并立", ly:{terr:1,passes:1,rivers:1,cities:1,battles:0,diplo:0,routes:0,water:0,reach:0}, view:null,
+  html:`<p>战国二百余年，名将说客来来去去，最终吞并所有对手的，却是地处西陲、一度被中原诸侯视为「戎狄」的秦。是运气、名将，还是变法？都对——但都有一个地理前提：</p>
+  <p>看地形图。秦的国土是<b>两个带围墙的房间</b>（关中盆地、四川盆地），六国的国土大多摊在<b>一间没有门的大厅</b>（华北—江淮平原）里。房间里的改革无人打断，大厅里的财富人人可取。</p>
+  <p class="hint">地图可拖动、滚轮缩放；彩色区域为约前262年七国疆域（概略示意）。点击「下一步」。</p>`},
+ {t:"关中：百二秦关", ly:{terr:0,passes:1,rivers:1,cities:1,battles:0,diplo:0,routes:0,water:0,reach:1}, view:[109.3,34.5,3.1], thres:550,
+  html:`<p>渭水冲出八百里沃野，四面被山河围死：东<b>函谷关</b>——黄河与崤山之间的一线孔道，南<b>武关</b>，西<b>大散关</b>，北<b>萧关</b>，是谓「<i>四塞之国</i>」。守住四个门，诸侯百万之众叩关而不得入；打开函谷，秦军顺坡而下直临中原。《史记》载田肯语「<i>秦得百二焉</i>」——后世遂称「百二秦关」：以二万人可当诸侯百万。</p>
+  <p>前318年起，六国五次合纵攻秦，几乎每次都顿死在函谷关外；战果最大的一次（前296年，孟尝君合齐韩魏苦战三年）也不过败秦军于函谷、迫秦割地求和——例外的代价恰好证明了规则。更关键的是时间维度：<b>商鞅变法</b>（前356/前350）在城墙后不受打断地复利了一百年；魏国变法早秦半个世纪，却因身处四战之地被一次次打断清零。</p>
+  <p class="hint">金色是从咸阳出发、不越过通行海拔的连续可达区——注意它被四塞锁在盆地里，只从函谷、武关两个「门缝」漏出去。切换出发点为「大梁」，再看看魏国的处境。</p>`},
+ {t:"巴蜀：第二个粮仓", ly:{terr:0,passes:1,rivers:1,cities:1,battles:1,diplo:0,routes:0,water:1,reach:0}, view:[106.3,31.6,2.5],
+  html:`<p>前316年，<b>司马错</b>力排张仪「先攻韩、挟天子」之议，率军翻越金牛道灭蜀：「<i>得蜀则得楚，楚亡则天下并矣</i>。」从此秦多了一个天府盆地：李冰筑<b>都江堰</b>（约前256年），成都平原从此旱涝保收；粮草兵员自岷江入长江，<b>顺流而下</b>直扑楚国腹地。</p>
+  <p>白起攻<b>鄢郢</b>（前279–278）正是这盘棋的兑现——楚失故都西壁，被迫迁都于陈。前246年<b>郑国渠</b>又灌关中泽卤之地四万余顷。两大粮仓在手：秦打的是补给顺流的仗，六国打的是逆流仰攻的仗。</p>`},
+ {t:"刀法：远交近攻", ly:{terr:1,passes:1,rivers:1,cities:1,battles:1,diplo:1,routes:0,water:0,reach:0}, view:[113.5,34.8,1.9],
+  html:`<p>约前270年，范雎入秦献策，前266年拜相后定为国策：「<i>远交而近攻，得寸则王之寸，得尺亦王之尺</i>。」翻译成地理语言：贿赂够不着的（齐、燕），猛砍挨着的（韩、魏、赵）。</p>
+  <p>三场歼灭战照此执行：<b>伊阙</b>（前293，白起斩韩魏联军24万）、<b>鄢郢</b>（前279–278，夺楚半壁）、<b>长平</b>（前260，赵卒约45万尽没）。每一刀都砍在函谷关出口两侧的近邻身上，齐燕受着「亲善」远远观望——直到发现自己已是下一个。六国不是不懂合纵，而是每次都在「谁先出兵、谁多出力」的算计里散伙：<b>地理让秦只需要一个决策者，让六国需要六个</b>。</p>`},
+ {t:"十年收官", ly:{terr:1,passes:0,rivers:1,cities:1,battles:0,diplo:0,routes:1,water:0,reach:0}, view:[114.8,35.8,1.45],
+  html:`<p>前230–前221，十年灭六国。顺序本身就是一张地理作业单：</p>
+  <p><b>①韩</b>（前230）——函谷关外第一家，先拔咽喉；<b>②赵</b>（前228）——破邯郸，代王嘉苟延至前222；<b>③魏</b>（前225）——王贲引河水灌大梁，三月城坏；<b>④楚</b>（前223）——王翦坚持非<i>60万人</i>不可（此前李信率20万已惨败一次）；<b>⑤燕</b>（前226破蓟、前222平辽东）；<b>⑥齐</b>（前221）——王贲自燕地南下，齐不战而降。</p>
+  <p>由近及远、先弱后强、先三晋后楚齐——每一步都踩着上一步夺来的粮道与出发阵地。</p>`},
+ {t:"为什么是秦", ly:{terr:1,passes:1,rivers:1,cities:1,battles:0,diplo:0,routes:0,water:0,reach:1}, view:null, thres:700,
+  html:`<p>把棋盘拉远：秦攻六国，出关是<b>顺坡、顺流、内线</b>；六国攻秦，入关是<b>仰攻、逆流、六家分账</b>。力量投送的损耗是单向的——秦的每一分国力都花在刀刃上，六国的国力先要交一笔「地理税」。</p>
+  <p>制度是发动机——耕战体制把每个农户变成动员单元；地理是护城河——让发动机可以百年不熄火。六国不缺发动机（魏李悝、楚吴起、赵武灵王都点过火），缺的是一道让改革免于打断的墙。</p>
+  <p>也要诚实补一句：<b>地形不是宿命</b>。同样的关中，西周守不住，前秦昙花一现；但在战国那场长达两百年的淘汰赛里，复利站在有围墙的一边。</p>
+  <div class="seals">
+    <div class="seal jun">形胜<em>据山河之固 · 攻守由我</em></div>
+    <div class="seal gong">耕战<em>举国为兵农 · 百年不辍</em></div>
+  </div>
+  <p class="hint">试试滑杆与出发点切换：同一个海拔上限，从咸阳出发是「房间与门缝」，从大梁出发是「四面漏风的大厅」。</p>`},
+];
+
+/* ================= engine (same architecture as 山河之限) ================= */
+const mapCv = document.getElementById('map'), ovlCv = document.getElementById('ovl');
+const mctx = mapCv.getContext('2d'), octx = ovlCv.getContext('2d');
+let view = {cx: W/2, cy: H/2, scale: 0.6};
+let fitScale = 0.6, dpr = 1, cw = 0, ch = 0;
+let anim = null;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const img = new Image();
+img.onload = () => {
+  const c = document.createElement('canvas'); c.width=W; c.height=H;
+  const x = c.getContext('2d', {willReadFrequently:true});
+  x.drawImage(img, 0, 0);
+  const d = x.getImageData(0,0,W,H).data;
+  heights = new Float32Array(W*H);
+  for (let i=0,p=0;i<W*H;i++,p+=4) heights[i] = (d[p]*256 + d[p+1])*8 - 800;
+  renderBase();
+  renderReach();
+  renderTerr();
+  legend();
+  resize();
+  setStep(0, true);
+};
+img.src = "data:image/png;base64," + HEIGHT_B64;
+
+function renderBase(){
+  const ctx = baseCv.getContext('2d');
+  const out = ctx.createImageData(W, H);
+  const o = out.data;
+  const mpp = new Float32Array(H);
+  for (let y=0;y<H;y++){
+    const lat = imgToGeo(0, y+0.5)[1];
+    mpp[y] = 2445.98 * Math.cos(lat*Math.PI/180) * 2;
+  }
+  const ZEX = 1.25, alt = 45*Math.PI/180;
+  const sinAlt = Math.sin(alt), cosAlt = Math.cos(alt);
+  const azm = (360 - 315 + 90) * Math.PI/180;
+  for (let y=0;y<H;y++){
+    const y0 = Math.max(y-1,0)*W, y1 = Math.min(y+1,H-1)*W, yr = y*W;
+    for (let x=0;x<W;x++){
+      const xl = Math.max(x-1,0), xr = Math.min(x+1,W-1);
+      const h = heights[yr+x];
+      const dzdx = (heights[yr+xr]-heights[yr+xl]) * ZEX / mpp[y];
+      const dzdy = (heights[y1+x]-heights[y0+x]) * ZEX / mpp[y];
+      const slope = Math.atan(Math.hypot(dzdx,dzdy));
+      const aspect = Math.atan2(dzdy, -dzdx);
+      let hs = sinAlt*Math.cos(slope) + cosAlt*Math.sin(slope)*Math.cos(azm-aspect);
+      if (hs<0) hs=0;
+      const c = rampColor(h);
+      let f;
+      if (h>0){
+        f = 0.55 + 0.55*hs;
+        if (heights[yr+xl]<=0 || heights[yr+xr]<=0 || heights[y0+x]<=0 || heights[y1+x]<=0) f *= 0.62;
+      } else f = 0.88 + 0.14*hs;
+      const p=(yr+x)*4;
+      o[p]=Math.min(255,c[0]*f); o[p+1]=Math.min(255,c[1]*f); o[p+2]=Math.min(255,c[2]*f); o[p+3]=255;
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function renderReach(){
+  if (!heights) return;
+  const g = heights;
+  const sg = SEEDS[seedName];
+  const seed = geoToImg(sg[0], sg[1]).map(v=>v|0);
+  const vis = new Uint8Array(W*H);
+  const q = new Int32Array(W*H); let qh=0, qt=0;
+  const s0 = seed[1]*W + seed[0];
+  if (g[s0] > 0 && g[s0] <= thresholdM){ vis[s0]=1; q[qt++]=s0; }
+  while (qh<qt){
+    const i = q[qh++], x = i%W, y = (i/W)|0;
+    if (x>0){const j=i-1; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+    if (x<W-1){const j=i+1; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+    if (y>0){const j=i-W; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+    if (y<H-1){const j=i+W; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+  }
+  const ctx = reachCv.getContext('2d');
+  const out = ctx.createImageData(W,H), o = out.data;
+  for (let i=0;i<W*H;i++){
+    if (!vis[i]) continue;
+    const p=i*4; o[p]=232; o[p+1]=164; o[p+2]=44; o[p+3]=165;
+    const x=i%W, y=(i/W)|0;
+    if ((x>0&&!vis[i-1])||(x<W-1&&!vis[i+1])||(y>0&&!vis[i-W])||(y<H-1&&!vis[i+W])){ o[p]=255; o[p+1]=196; o[p+2]=64; o[p+3]=235; }
+  }
+  ctx.putImageData(out,0,0);
+}
+
+function renderTerr(){
+  const ctx = terrCv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  for (const st of STATES){
+    ctx.beginPath();
+    st.poly.forEach((g,i)=>{ const [x,y]=geoToImg(g[0],g[1]); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.closePath();
+    ctx.fillStyle = `rgba(${st.c[0]},${st.c[1]},${st.c[2]},0.20)`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(${st.c[0]},${st.c[1]},${st.c[2]},0.85)`;
+    ctx.lineWidth = 2; ctx.stroke();
+  }
+}
+
+function legend(){
+  const cv = document.getElementById('legcv');
+  const w = cv.clientWidth || 340; cv.width=w; cv.height=14;
+  const x = cv.getContext('2d');
+  const ticks=[0,200,500,1000,2000,4000,6000];
+  const seaW = w/8;
+  for (let px=0;px<seaW;px++){ const c=rampColor(-800 + (px/seaW)*800);
+    x.fillStyle=`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; x.fillRect(px,0,1.5,14); }
+  const segW=(w-seaW)/(ticks.length-1);
+  for (let s=0;s<ticks.length-1;s++)
+    for (let px=0;px<segW;px++){ const c=rampColor(ticks[s]+(px/segW)*(ticks[s+1]-ticks[s]));
+      x.fillStyle=`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; x.fillRect(seaW+s*segW+px,0,1.5,14); }
+}
+
+/* ---------- view/draw ---------- */
+function resize(){
+  dpr = Math.min(window.devicePixelRatio||1, 2);
+  const r = mapCv.parentElement.getBoundingClientRect();
+  cw = r.width; ch = r.height;
+  for (const cv of [mapCv, ovlCv]){ cv.width=cw*dpr; cv.height=ch*dpr; }
+  fitScale = Math.min(cw/W, ch/H);
+  view.scale = Math.max(view.scale, fitScale*0.85);
+  legend();
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const imgToScr = (x,y) => [ (x-view.cx)*view.scale + cw/2, (y-view.cy)*view.scale + ch/2 ];
+const scrToImg = (sx,sy) => [ (sx-cw/2)/view.scale + view.cx, (sy-ch/2)/view.scale + view.cy ];
+const geoToScr = (lon,lat) => { const [x,y]=geoToImg(lon,lat); return imgToScr(x,y); };
+
+function clampView(){
+  view.scale = Math.min(Math.max(view.scale, fitScale*0.85), 12);
+  const hw = cw/2/view.scale, hh = ch/2/view.scale;
+  if (2*hw >= W) view.cx = W/2; else view.cx = Math.min(Math.max(view.cx, hw), W-hw);
+  if (2*hh >= H) view.cy = H/2; else view.cy = Math.min(Math.max(view.cy, hh), H-hh);
+}
+
+let needsDraw = false;
+function draw(){ needsDraw = true; }
+function frame(t){
+  requestAnimationFrame(frame);
+  if (anim){
+    const k = Math.min(1, (t-anim.t0)/anim.dur);
+    const e = k<.5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+    view.cx = anim.from[0]+(anim.to[0]-anim.from[0])*e;
+    view.cy = anim.from[1]+(anim.to[1]-anim.from[1])*e;
+    view.scale = Math.exp(Math.log(anim.from[2])+(Math.log(anim.to[2])-Math.log(anim.from[2]))*e);
+    if (k>=1) anim=null;
+    needsDraw = true;
+  }
+  if ((layers.routes.on||layers.diplo.on||layers.battles.on) && !reduceMotion) needsDraw = true;
+  if (!needsDraw) return;
+  needsDraw = false;
+  clampView();
+  paint(t);
+}
+requestAnimationFrame(frame);
+
+function flyTo(lon, lat, scale, dur=1100){
+  const tgt = lon===null ? [W/2, H/2, fitScale] : [...geoToImg(lon,lat), scale*fitScale];
+  if (reduceMotion || dur<=0){ anim=null; view={cx:tgt[0],cy:tgt[1],scale:tgt[2]}; draw(); return; }
+  anim = {from:[view.cx,view.cy,view.scale], to:tgt, t0:performance.now(), dur};
+}
+
+function paint(now){
+  mctx.setTransform(dpr,0,0,dpr,0,0);
+  mctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--map-bg').trim() || "#1a2c42";
+  mctx.fillRect(0,0,cw,ch);
+  const [x0,y0] = imgToScr(0,0);
+  const s = view.scale;
+  mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = "high";
+  mctx.save();
+  mctx.shadowColor = "rgba(0,0,0,.55)"; mctx.shadowBlur = 34;
+  mctx.drawImage(baseCv, x0, y0, W*s, H*s);
+  mctx.restore();
+  if (layers.reach.on) mctx.drawImage(reachCv, x0, y0, W*s, H*s);
+  if (layers.terr.on)  mctx.drawImage(terrCv, x0, y0, W*s, H*s);
+
+  octx.setTransform(dpr,0,0,dpr,0,0);
+  octx.clearRect(0,0,cw,ch);
+  octx.lineJoin="round"; octx.lineCap="round";
+  const css = getComputedStyle(document.documentElement);
+  const C = {
+    accent: css.getPropertyValue('--accent').trim() || '#d05a35',
+    indigo: css.getPropertyValue('--indigo').trim() || '#6d9dd4',
+    gold: css.getPropertyValue('--gold').trim() || '#d4a94f',
+    green: css.getPropertyValue('--green').trim() || '#8fae62',
+  };
+
+  if (layers.rivers.on){
+    const rw = Math.min(2.6, 1.35 + s*.3);
+    for (const rv of RIVERS.rivers) for (const line of rv.lines){
+      path(line);
+      octx.strokeStyle = "rgba(240,248,255,.28)"; octx.lineWidth = rw+1.3; octx.stroke();
+      octx.strokeStyle = "rgba(62,124,176,.95)"; octx.lineWidth = rw; octx.stroke();
+    }
+  }
+
+  /* state name labels */
+  octx.textAlign="center"; octx.textBaseline="middle";
+  if (layers.terr.on){
+    for (const st of STATES){
+      if (st.small && s < fitScale*1.6) continue;
+      const [sx,sy]=geoToScr(st.lab[0],st.lab[1]);
+      const size = st.small ? 11 : Math.min(30, 17+s*7);
+      haloText(st.n, sx, sy, {size, color:st.labc, halo:"rgba(255,250,235,.6)", serif:1, bold:1, ls:st.small?0:2});
+    }
+  }
+
+  if (layers.passes.on){
+    for (const p of PASSES){
+      const [sx,sy]=geoToScr(p.g[0],p.g[1]);
+      if (sx<-30||sy<-30||sx>cw+30||sy>ch+30) continue;
+      octx.fillStyle = C.accent; octx.strokeStyle="rgba(40,20,10,.8)"; octx.lineWidth=1;
+      octx.beginPath(); octx.moveTo(sx,sy-5.5); octx.lineTo(sx-5,sy+3.5); octx.lineTo(sx+5,sy+3.5); octx.closePath();
+      octx.fill(); octx.stroke();
+      if (s > fitScale*1.4) haloText(p.n, sx, sy+13, {size:11, color:C.accent, bold:1});
+    }
+    if (s > fitScale*1.8){
+      const [ax,ay]=geoToScr(XIAOHAN.a[0],XIAOHAN.a[1]), [bx,by]=geoToScr(XIAOHAN.b[0],XIAOHAN.b[1]);
+      octx.strokeStyle=C.accent; octx.lineWidth=1.6; octx.setLineDash([2,3]);
+      octx.beginPath(); octx.moveTo(ax,ay); octx.lineTo(bx,by); octx.stroke(); octx.setLineDash([]);
+      haloText(XIAOHAN.label, (ax+bx)/2, (ay+by)/2-12, {size:12, color:C.accent, bold:1});
+    }
+  }
+
+  for (const [n,lon,lat,rot,size,kind] of TERRA){
+    if (kind==="riv" && !layers.rivers.on) continue;
+    if ((kind==="mtn"||kind==="reg") && !layers.passes.on) continue;
+    const [sx,sy]=geoToScr(lon,lat);
+    if (sx<-60||sy<-40||sx>cw+60||sy>ch+40) continue;
+    const cfg = {
+      mtn:{color:"rgba(96,58,36,.95)", halo:"rgba(255,246,226,.55)", ls:3},
+      reg:{color:"rgba(96,58,36,.8)",  halo:"rgba(255,246,226,.45)", ls:5},
+      plain:{color:"rgba(58,84,38,.85)", halo:"rgba(255,250,230,.5)", ls:5},
+      sea:{color:"rgba(198,220,238,.9)", halo:"rgba(20,42,66,.35)", ls:6, style:"italic"},
+      riv:{color:"rgba(178,208,232,.95)", halo:"rgba(20,42,66,.4)", ls:2, style:"italic"},
+    }[kind];
+    const minS = {mtn:1.25, reg:1.0, plain:1.15, sea:0.9, riv:1.5}[kind];
+    if (s < fitScale*minS) continue;
+    haloText(n, sx, sy, {size:size*(kind==="riv"?1:Math.min(1.25,.8+s*.18)), color:cfg.color, halo:cfg.halo,
+      rot, ls:cfg.ls, style:cfg.style, serif:1});
+  }
+
+  if (layers.water.on){
+    for (const wk of WATERWORKS){
+      const [sx,sy]=geoToScr(wk.g[0],wk.g[1]);
+      if (wk.line){
+        octx.strokeStyle=C.green; octx.lineWidth=2.2; octx.setLineDash([5,3]);
+        path(wk.line); octx.stroke(); octx.setLineDash([]);
+      }
+      octx.strokeStyle=C.green; octx.fillStyle="rgba(255,255,240,.9)"; octx.lineWidth=2;
+      octx.beginPath(); octx.arc(sx,sy,5,0,7); octx.fill(); octx.stroke();
+      octx.beginPath(); octx.moveTo(sx-5,sy); octx.lineTo(sx+5,sy); octx.moveTo(sx,sy-5); octx.lineTo(sx,sy+5); octx.stroke();
+      haloText(wk.n, sx, sy+15, {size:11, color:C.green, bold:1});
+    }
+  }
+
+  if (layers.battles.on){
+    const dash = reduceMotion ? 0 : (now/45)%20;
+    route(R_SHU, C.accent, dash);
+    routeLabel(R_SHU, C.accent, .5, -14);
+    for (const b of BATTLES){
+      const [sx,sy]=geoToScr(b.g[0],b.g[1]);
+      octx.strokeStyle=C.accent; octx.lineWidth=2.6;
+      octx.beginPath(); octx.moveTo(sx-6,sy-6); octx.lineTo(sx+6,sy+6); octx.moveTo(sx+6,sy-6); octx.lineTo(sx-6,sy+6); octx.stroke();
+      if (s>fitScale*1.15) haloText(b.n, sx, sy-14, {size:11, color:C.accent, bold:1});
+    }
+  }
+
+  if (layers.diplo.on){
+    const dash = reduceMotion ? 0 : (now/45)%20;
+    for (const a of DIPLO.near){
+      octx.strokeStyle=C.accent; octx.lineWidth=3; octx.setLineDash([]);
+      path(a.pts); octx.stroke();
+      const n=a.pts.length; const [ax,ay]=geoToScr(...a.pts[n-2]), [bx,by]=geoToScr(...a.pts[n-1]);
+      arrowHead(ax,ay,bx,by,C.accent);
+      if (a.t) { const [mx,my]=geoToScr(...a.pts[0]); haloText(a.t, mx+55, my-14, {size:12.5, color:C.accent, bold:1}); }
+    }
+    for (const a of DIPLO.far){
+      octx.strokeStyle=C.gold; octx.lineWidth=2; octx.setLineDash([8,6]); octx.lineDashOffset=-dash;
+      qpath(a.pts); octx.stroke(); octx.setLineDash([]);
+      const n=a.pts.length; const [ax,ay]=geoToScr(...a.pts[n-2]), [bx,by]=geoToScr(...a.pts[n-1]);
+      arrowHead(ax,ay,bx,by,C.gold);
+      if (a.t){ const [mx,my]=geoToScr(...a.pts[1]); haloText(a.t, mx, my-12, {size:12, color:C.gold, bold:1}); }
+    }
+  }
+
+  if (layers.routes.on){
+    const dash = reduceMotion ? 0 : (now/45)%20;
+    for (const r of CONQ){
+      octx.strokeStyle=C.accent; octx.lineWidth=2.4;
+      octx.setLineDash([9,6]); octx.lineDashOffset=-dash;
+      path(r.pts); octx.stroke(); octx.setLineDash([]);
+      const n=r.pts.length; const [ax,ay]=geoToScr(...r.pts[n-2]), [bx,by]=geoToScr(...r.pts[n-1]);
+      arrowHead(ax,ay,bx,by,C.accent);
+      const [ex,ey]=geoToScr(...r.pts[n-1]);
+      octx.fillStyle=C.accent; octx.beginPath(); octx.arc(ex,ey+0.5,9,0,7); octx.fill();
+      haloText(r.num, ex, ey+1, {size:11, color:"#f7efe2", halo:"transparent", bold:1});
+      if (s>fitScale*1.1) haloText(r.yr, ex, ey+20, {size:11, color:C.accent, bold:1});
+    }
+  }
+
+  if (layers.cities.on){
+    octx.textAlign="left";
+    for (const c of CITIES){
+      const [sx,sy]=geoToScr(c.g[0],c.g[1]);
+      if (sx<-20||sy<-20||sx>cw+20||sy>ch+20) continue;
+      if (!c.cap && s < fitScale*1.3) continue;
+      const r = c.cap?4:3;
+      octx.fillStyle = c.cap? "#f3ead8" : "#ded2ba";
+      octx.strokeStyle = "rgba(40,30,20,.9)"; octx.lineWidth=1.2;
+      octx.beginPath(); octx.arc(sx,sy,r,0,7); octx.fill(); octx.stroke();
+      haloText(c.n, sx+r+3, sy, {size:11.5, color:"rgba(30,22,12,.95)", halo:"rgba(255,248,232,.7)", align:"left"});
+    }
+    octx.textAlign="center";
+  }
+
+  if (profile.line){
+    octx.strokeStyle = "rgba(240,235,220,.9)"; octx.lineWidth=1.6; octx.setLineDash([1,5]);
+    octx.beginPath();
+    profile.line.forEach((g,i)=>{ const [sx,sy]=geoToScr(g[0],g[1]); i?octx.lineTo(sx,sy):octx.moveTo(sx,sy); });
+    octx.stroke(); octx.setLineDash([]);
+    const ends = [profile.line[0], profile.line[profile.line.length-1]];
+    ["甲","乙"].forEach((ch2,i)=>{
+      const [sx,sy]=geoToScr(ends[i][0],ends[i][1]);
+      octx.fillStyle="#2b2115"; octx.beginPath(); octx.arc(sx,sy,8,0,7); octx.fill();
+      octx.strokeStyle="rgba(245,238,220,.9)"; octx.lineWidth=1.4; octx.stroke();
+      haloText(ch2, sx, sy+.5, {size:10, color:"#f3ecd9", halo:"transparent"});
+    });
+    if (profile.hoverG){
+      const [sx,sy]=geoToScr(profile.hoverG[0], profile.hoverG[1]);
+      octx.fillStyle="#fff"; octx.strokeStyle="rgba(0,0,0,.6)"; octx.lineWidth=1.5;
+      octx.beginPath(); octx.arc(sx,sy,4.5,0,7); octx.fill(); octx.stroke();
+    }
+  }
+  if (picking.on && picking.a){
+    const [sx,sy]=geoToScr(picking.a[0],picking.a[1]);
+    octx.fillStyle="#2b2115"; octx.beginPath(); octx.arc(sx,sy,8,0,7); octx.fill();
+    octx.strokeStyle="rgba(245,238,220,.9)"; octx.lineWidth=1.4; octx.stroke();
+    haloText("甲", sx, sy+.5, {size:10, color:"#f3ecd9", halo:"transparent"});
+  }
+  scalebar();
+}
+
+function path(line){
+  octx.beginPath();
+  for (let i=0;i<line.length;i++){
+    const [sx,sy]=geoToScr(line[i][0], line[i][1]);
+    i?octx.lineTo(sx,sy):octx.moveTo(sx,sy);
+  }
+}
+function qpath(line){ // smooth quadratic through points
+  octx.beginPath();
+  const pts = line.map(g=>geoToScr(g[0],g[1]));
+  octx.moveTo(pts[0][0], pts[0][1]);
+  for (let i=1;i<pts.length-1;i++){
+    const mx=(pts[i][0]+pts[i+1][0])/2, my=(pts[i][1]+pts[i+1][1])/2;
+    octx.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
+  }
+  octx.lineTo(pts[pts.length-1][0], pts[pts.length-1][1]);
+}
+function route(r, color, dash){
+  octx.strokeStyle = color; octx.lineWidth = 2.4;
+  octx.setLineDash([9,6]); octx.lineDashOffset = -dash;
+  path(r.pts); octx.stroke(); octx.setLineDash([]);
+  const n = r.pts.length;
+  const [ax,ay]=geoToScr(...r.pts[n-2]), [bx,by]=geoToScr(...r.pts[n-1]);
+  arrowHead(ax,ay,bx,by,color);
+}
+function arrowHead(ax,ay,bx,by,color){
+  const a = Math.atan2(by-ay,bx-ax);
+  octx.fillStyle=color; octx.beginPath();
+  octx.moveTo(bx,by);
+  octx.lineTo(bx-11*Math.cos(a-.42), by-11*Math.sin(a-.42));
+  octx.lineTo(bx-11*Math.cos(a+.42), by-11*Math.sin(a+.42));
+  octx.closePath(); octx.fill();
+}
+function routeLabel(r, color, frac, dy){
+  const i = Math.floor(r.pts.length*frac);
+  const [sx,sy] = geoToScr(...r.pts[i]);
+  haloText(r.name, sx, sy+dy, {size:11, color, bold:1});
+}
+function haloText(txt, x, y, o={}){
+  octx.save();
+  octx.translate(x,y); if (o.rot) octx.rotate(o.rot*Math.PI/180);
+  const fam = o.serif? '"Songti SC","Noto Serif SC","SimSun",serif' : '-apple-system,"PingFang SC",sans-serif';
+  octx.font = `${o.style==="italic"?"italic ":""}${o.bold?"600 ":""}${o.size||12}px ${fam}`;
+  if (o.ls) octx.letterSpacing = o.ls+"px";
+  if (o.align) octx.textAlign = o.align;
+  octx.lineWidth = 3; octx.strokeStyle = o.halo || "rgba(255,248,230,.55)";
+  if (o.halo!=="transparent") octx.strokeText(txt, 0, 0);
+  octx.fillStyle = o.color || "#333"; octx.fillText(txt, 0, 0);
+  octx.letterSpacing = "0px";
+  if (o.align) octx.textAlign = "center";
+  octx.restore();
+}
+function scalebar(){
+  const g1 = imgToGeo(view.cx, view.cy);
+  const mPerImgPx = 40075016*(MX1-MX0)/W * Math.cos(g1[1]*Math.PI/180);
+  const mPerScrPx = mPerImgPx/view.scale;
+  const targets=[20,50,100,200,300,500,800];
+  let km=100;
+  for (const t of targets){ if (t*1000/mPerScrPx <= 160){ km=t; } }
+  document.getElementById('sblabel').textContent = km + " km";
+  document.getElementById('sbbar').style.width = (km*1000/mPerScrPx).toFixed(0)+"px";
+}
+
+/* ---------- interactions ---------- */
+let dragging=false, lastP=null, moved=false;
+const touches = new Map(); let pinch=null;
+ovlCv.style.touchAction = "none";
+ovlCv.addEventListener('pointerdown', e=>{
+  touches.set(e.pointerId, [e.clientX,e.clientY]);
+  if (touches.size===2){
+    const [a,b]=[...touches.values()];
+    pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]), scale:view.scale}; dragging=false;
+  } else { dragging=true; moved=false; lastP=[e.clientX,e.clientY]; }
+  ovlCv.setPointerCapture(e.pointerId);
+  if(!picking.on) ovlCv.classList.add('grabbing');
+});
+ovlCv.addEventListener('pointermove', e=>{
+  const r = ovlCv.getBoundingClientRect();
+  const sx=e.clientX-r.left, sy=e.clientY-r.top;
+  if (touches.has(e.pointerId)) touches.set(e.pointerId, [e.clientX,e.clientY]);
+  if (pinch && touches.size===2){
+    const [a,b]=[...touches.values()];
+    const d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const mx=(a[0]+b[0])/2-r.left, my=(a[1]+b[1])/2-r.top;
+    const [ix,iy]=scrToImg(mx,my);
+    view.scale = Math.min(Math.max(pinch.scale*d/pinch.d, fitScale*0.85), 12);
+    view.cx = ix-(mx-cw/2)/view.scale; view.cy = iy-(my-ch/2)/view.scale;
+    anim=null; draw(); moved=true;
+    return;
+  }
+  if (dragging && lastP){
+    const dx=e.clientX-lastP[0], dy=e.clientY-lastP[1];
+    if (Math.abs(dx)+Math.abs(dy)>2) moved=true;
+    view.cx -= dx/view.scale; view.cy -= dy/view.scale;
+    lastP=[e.clientX,e.clientY]; anim=null; draw();
+  }
+  const [ix,iy]=scrToImg(sx,sy);
+  const ro=document.getElementById('readout');
+  if (heights && ix>=0&&iy>=0&&ix<W&&iy<H){
+    const h = heights[(iy|0)*W+(ix|0)];
+    const [lon,lat]=imgToGeo(ix,iy);
+    ro.innerHTML = `${lon.toFixed(2)}°E ${lat.toFixed(2)}°N · ` + (h>0?`海拔 <b>${Math.round(h)} m</b>`:`海深 <b>${Math.round(-h)} m</b>`);
+  } else ro.textContent="—";
+});
+function rearmDrag(){
+  // after a pinch ends with one finger still down, keep panning with it
+  if (touches.size===1){
+    pinch=null;
+    lastP=[...touches.values()][0].slice();
+    dragging=true; moved=true;
+  } else if (touches.size<2) pinch=null;
+}
+ovlCv.addEventListener('pointercancel', e=>{
+  touches.delete(e.pointerId);
+  dragging=false; ovlCv.classList.remove('grabbing');
+  rearmDrag();
+});
+ovlCv.addEventListener('pointerup', e=>{
+  touches.delete(e.pointerId);
+  ovlCv.classList.remove('grabbing');
+  dragging=false;
+  rearmDrag();
+  if (!moved && picking.on){
+    const r = ovlCv.getBoundingClientRect();
+    const [ix,iy]=scrToImg(e.clientX-r.left, e.clientY-r.top);
+    const g = imgToGeo(Math.min(Math.max(ix,0),W-1), Math.min(Math.max(iy,0),H-1));
+    if (!picking.a){ picking.a=g; draw(); }
+    else {
+      const a=picking.a; picking.on=false; picking.a=null;
+      ovlCv.classList.remove('pick');
+      runProfile([a,g], "自选剖面");
+    }
+  }
+});
+ovlCv.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const r = ovlCv.getBoundingClientRect();
+  const sx=e.clientX-r.left, sy=e.clientY-r.top;
+  const [ix,iy]=scrToImg(sx,sy);
+  view.scale *= Math.exp(-e.deltaY*0.0016);
+  view.scale = Math.min(Math.max(view.scale, fitScale*0.85), 12);
+  view.cx = ix-(sx-cw/2)/view.scale;
+  view.cy = iy-(sy-ch/2)/view.scale;
+  anim=null; draw();
+}, {passive:false});
+document.getElementById('zin').onclick = ()=>{ view.scale*=1.45; anim=null; draw(); };
+document.getElementById('zout').onclick = ()=>{ view.scale/=1.45; anim=null; draw(); };
+document.getElementById('zfit').onclick = ()=>flyTo(null);
+
+/* ---------- layers UI ---------- */
+const layersDiv = document.getElementById('layers');
+for (const k in layers){
+  const l = layers[k];
+  const lab = document.createElement('label'); lab.className='lay';
+  lab.innerHTML = `<input type="checkbox" ${l.on?'checked':''}><span class="sw" style="background:${l.sw}"></span><span>${l.name}</span>`;
+  lab.querySelector('input').addEventListener('change', e=>{ l.on=e.target.checked; draw(); });
+  layersDiv.appendChild(lab);
+  l.input = lab.querySelector('input');
+}
+const tslider = document.getElementById('tslider');
+tslider.addEventListener('input', ()=>{
+  thresholdM = +tslider.value;
+  document.getElementById('tval').textContent = thresholdM+" m";
+  renderReach(); draw();
+});
+const seedQ=document.getElementById('seedQ'), seedW=document.getElementById('seedW');
+function setSeed(n){
+  seedName=n;
+  seedQ.classList.toggle('on', n==='xianyang');
+  seedW.classList.toggle('on', n==='daliang');
+  renderReach();
+  if (!layers.reach.on){ layers.reach.on=true; layers.reach.input.checked=true; }
+  draw();
+}
+seedQ.onclick=()=>setSeed('xianyang');
+seedW.onclick=()=>setSeed('daliang');
+
+/* ---------- story ---------- */
+const stepsDiv = document.getElementById('steps');
+STEPS.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.textContent = (i+1)+"·"+s.t.split("：")[0];
+  b.onclick=()=>setStep(i);
+  stepsDiv.appendChild(b);
+});
+let curStep = 0;
+function setStep(i, instant){
+  curStep = i;
+  [...stepsDiv.children].forEach((b,j)=>b.classList.toggle('on', j===i));
+  const s = STEPS[i];
+  document.getElementById('story').innerHTML = `<h3>${["壹","贰","叁","肆","伍","陆"][i]} · ${s.t}</h3>` + s.html;
+  for (const k in s.ly){ layers[k].on = !!s.ly[k]; layers[k].input.checked = !!s.ly[k]; }
+  if (s.thres && s.thres !== thresholdM){
+    thresholdM = s.thres; tslider.value = s.thres;
+    document.getElementById('tval').textContent = s.thres+" m";
+    renderReach();
+  }
+  document.getElementById('prev').disabled = i===0;
+  document.getElementById('next').textContent = i===STEPS.length-1 ? "回到开头 ↺" : "下一步 →";
+  if (s.view) flyTo(s.view[0], s.view[1], s.view[2], instant?0:1300);
+  else flyTo(null, null, null, instant?0:1300);
+  draw();
+  document.getElementById('panel').scrollTo({top:0, behavior: reduceMotion?'auto':'smooth'});
+}
+document.getElementById('prev').onclick=()=>setStep(Math.max(0,curStep-1));
+document.getElementById('next').onclick=()=>setStep((curStep+1)%STEPS.length);
+addEventListener('keydown', e=>{
+  const t = e.target;
+  if (t && /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(t.tagName)) return;
+  if (e.key==='ArrowRight') setStep((curStep+1)%STEPS.length);
+  if (e.key==='ArrowLeft') setStep(Math.max(0,curStep-1));
+});
+
+/* ---------- profile ---------- */
+const profile = {samples:null, line:null, hoverG:null, name:""};
+const picking = {on:false, a:null};
+const pfCv = document.getElementById('profchart');
+const pfBtns = [document.getElementById('pfA'),document.getElementById('pfB'),document.getElementById('pfC')];
+
+function sampleAlong(pts, n=420){
+  const cum=[0];
+  for (let i=1;i<pts.length;i++) cum.push(cum[i-1]+havKm(pts[i-1],pts[i]));
+  const total=cum[cum.length-1];
+  const out=[];
+  for (let i=0;i<n;i++){
+    const d = total*i/(n-1);
+    let j=1; while (j<cum.length-1 && cum[j]<d) j++;
+    const t=(d-cum[j-1])/((cum[j]-cum[j-1])||1);
+    const lon=pts[j-1][0]+(pts[j][0]-pts[j-1][0])*t;
+    const lat=pts[j-1][1]+(pts[j][1]-pts[j-1][1])*t;
+    let [ix,iy]=geoToImg(lon,lat);
+    ix=Math.min(Math.max(ix,0),W-1.001); iy=Math.min(Math.max(iy,0),H-1.001);
+    const x0=ix|0,y0=iy|0,fx=ix-x0,fy=iy-y0;
+    const h = heights[y0*W+x0]*(1-fx)*(1-fy)+heights[y0*W+x0+1]*fx*(1-fy)
+            + heights[(y0+1)*W+x0]*(1-fx)*fy+heights[(y0+1)*W+x0+1]*fx*fy;
+    out.push({d, h, g:[lon,lat]});
+  }
+  return {samples:out, total};
+}
+
+function runProfile(pts, name){
+  if (!heights) return;
+  const {samples,total} = sampleAlong(pts);
+  if (!(total > 1)){
+    document.getElementById('profstats').innerHTML = "两点距离太近，请重新选择相距更远的两点。";
+    return;
+  }
+  profile.samples=samples; profile.total=total; profile.line=pts; profile.name=name; profile.hoverG=null;
+  const above = samples.filter(s=>s.h>500).length/samples.length;
+  const maxS = samples.reduce((a,b)=>b.h>a.h?b:a);
+  const sea = samples.filter(s=>s.h<=0).length/samples.length;
+  let stats = `<b>${name}</b> · 全程 <b>${Math.round(total)} km</b> · 最高 <b>${Math.round(maxS.h)} m</b>`;
+  stats += sea>0.02 ? ` · 海上 ${(sea*100).toFixed(0)}%` : ` · >500m 路段 ${(above*100).toFixed(0)}%`;
+  document.getElementById('profstats').innerHTML = stats;
+  drawProfile();
+  draw();
+}
+function drawProfile(hoverI=-1){
+  const w = pfCv.clientWidth||360, h = pfCv.clientHeight||150;
+  pfCv.width=w*dpr; pfCv.height=h*dpr;
+  const x = pfCv.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0);
+  x.clearRect(0,0,w,h);
+  const css = getComputedStyle(document.documentElement);
+  const ink2 = css.getPropertyValue('--ink-2').trim(), line = css.getPropertyValue('--line').trim();
+  const accent = css.getPropertyValue('--accent').trim(), indigo = css.getPropertyValue('--indigo').trim();
+  if (!profile.samples){
+    x.fillStyle=ink2; x.font='12px -apple-system,"PingFang SC",sans-serif'; x.textAlign='center';
+    x.fillText("尚无剖面", w/2, h/2); return;
+  }
+  const S=profile.samples, ml=40, mr=10, mt=12, mb=20;
+  const pw=w-ml-mr, ph=h-mt-mb;
+  const maxH = Math.max(600, Math.ceil(S.reduce((a,b)=>Math.max(a,b.h),0)/500)*500);
+  const minH = Math.min(0, S.reduce((a,b)=>Math.min(a,b.h),0));
+  const X=d=>ml+d/profile.total*pw, Y=hh=>mt+ (maxH-hh)/(maxH-minH)*ph;
+  x.strokeStyle=line; x.lineWidth=1; x.fillStyle=ink2;
+  x.font='10px -apple-system,sans-serif'; x.textAlign='right'; x.textBaseline='middle';
+  for (let g=0; g<=maxH; g+=maxH>1500?1000:500){
+    x.globalAlpha=.6; x.beginPath(); x.moveTo(ml,Y(g)); x.lineTo(w-mr,Y(g)); x.stroke(); x.globalAlpha=1;
+    x.fillText(g, ml-5, Y(g));
+  }
+  x.textAlign='center'; x.textBaseline='top';
+  const kmStep = profile.total>900?300:100;
+  for (let d=0; d<=profile.total; d+=kmStep) x.fillText(d+"", X(d), h-mb+4);
+  x.fillText("km", w-mr-8, h-mb+4);
+  x.fillStyle = indigo; x.globalAlpha=.5;
+  x.beginPath(); let inSea=false;
+  for (const p of S){
+    if (p.h<=0 && !inSea){ x.moveTo(X(p.d), Y(0)); inSea=true; }
+    if (inSea){ x.lineTo(X(p.d), Y(Math.max(p.h,minH))); }
+    if (p.h>0 && inSea){ x.lineTo(X(p.d), Y(0)); inSea=false; }
+  }
+  if (inSea) x.lineTo(X(S[S.length-1].d), Y(0));
+  x.closePath(); x.fill(); x.globalAlpha=1;
+  x.beginPath(); x.moveTo(X(0), Y(Math.max(S[0].h,0)));
+  for (const p of S) x.lineTo(X(p.d), Y(Math.max(p.h,0)));
+  x.lineTo(X(profile.total), Y(0)); x.lineTo(X(0), Y(0)); x.closePath();
+  const grd = x.createLinearGradient(0,mt,0,Y(0));
+  grd.addColorStop(0, accent+"cc"); grd.addColorStop(1, accent+"22");
+  x.fillStyle=grd; x.fill();
+  x.strokeStyle=accent; x.lineWidth=1.6;
+  x.beginPath();
+  for (let i=0;i<S.length;i++){ const p=S[i]; i?x.lineTo(X(p.d),Y(p.h)):x.moveTo(X(p.d),Y(p.h)); }
+  x.stroke();
+  x.strokeStyle=ink2; x.globalAlpha=.7; x.beginPath(); x.moveTo(ml,Y(0)); x.lineTo(w-mr,Y(0)); x.stroke(); x.globalAlpha=1;
+  const maxP = S.reduce((a,b)=>b.h>a.h?b:a);
+  x.fillStyle=accent; x.beginPath(); x.arc(X(maxP.d),Y(maxP.h),3,0,7); x.fill();
+  x.textAlign = X(maxP.d)>w-70?'right':'left'; x.textBaseline='bottom';
+  x.font='600 10.5px -apple-system,sans-serif';
+  x.fillText(` ${Math.round(maxP.h)} m `, X(maxP.d), Y(maxP.h)-3);
+  if (hoverI>=0){
+    const p=S[hoverI];
+    x.strokeStyle=ink2; x.setLineDash([3,3]);
+    x.beginPath(); x.moveTo(X(p.d),mt); x.lineTo(X(p.d),h-mb); x.stroke(); x.setLineDash([]);
+    x.fillStyle=accent; x.beginPath(); x.arc(X(p.d),Y(Math.max(p.h,minH)),3.5,0,7); x.fill();
+    x.textAlign = X(p.d)>w-90?'right':'left'; x.textBaseline='top';
+    x.fillStyle = css.getPropertyValue('--ink').trim();
+    x.font='10.5px -apple-system,sans-serif';
+    x.fillText(` ${Math.round(p.d)} km · ${p.h>0?Math.round(p.h)+" m":"海"}`, X(p.d), mt);
+    profile.hoverG = p.g; draw();
+  } else if (profile.hoverG){ profile.hoverG=null; draw(); }
+}
+pfCv.addEventListener('mousemove', e=>{
+  if (!profile.samples) return;
+  const r=pfCv.getBoundingClientRect();
+  const d=(e.clientX-r.left-40)/(r.width-50)*profile.total;
+  let best=0,bd=1e18;
+  profile.samples.forEach((p,i)=>{ const dd=Math.abs(p.d-d); if(dd<bd){bd=dd;best=i;} });
+  drawProfile(best);
+});
+pfCv.addEventListener('mouseleave', ()=>drawProfile());
+
+function selectBtn(i){ pfBtns.forEach((b,j)=>b.classList.toggle('on', i===j)); }
+pfBtns[0].onclick=()=>{ selectBtn(0); picking.on=false; ovlCv.classList.remove('pick');
+  runProfile([[108.71,34.33],[109.6,34.55],[110.24,34.62],[110.87,34.63],[111.6,34.75],[112.45,34.62],[113.4,34.72],[114.31,34.80]], "咸阳→大梁（函谷道）"); };
+pfBtns[1].onclick=()=>{ selectBtn(1); picking.on=false; ovlCv.classList.remove('pick');
+  runProfile([[108.71,34.33],[109.32,34.15],[109.94,33.87],[110.59,33.63],[111.0,33.25],[111.5,32.9],[112.1,32.15],[112.19,30.33]], "咸阳→郢（武关道）"); };
+pfBtns[2].onclick=()=>{ selectBtn(2); picking.on=true; picking.a=null; ovlCv.classList.add('pick');
+  document.getElementById('profstats').innerHTML="在地图上点击两点（甲、乙）生成剖面。"; };
+
+new ResizeObserver(()=>{ legend(); if(profile.samples) drawProfile(); }).observe(document.getElementById('panel'));
+const themeWatch = ()=>{ draw(); if (profile.samples) drawProfile(); };
+new MutationObserver(themeWatch).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeWatch);
+</script>

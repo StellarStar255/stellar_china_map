@@ -1,0 +1,959 @@
+<title>山河之限 · 为什么中国吞得下山东，却吞不下朝鲜</title>
+<style>
+:root{
+  --bg:#14171d; --panel:#1d222b; --panel-2:#232a35; --ink:#eae4d6; --ink-2:#a89e8e; --ink-3:#7a7264;
+  --line:#333a46; --accent:#d05a35; --accent-dim:#a3492e; --indigo:#6d9dd4; --gold:#d4a94f; --green:#8fae62;
+  --chip:#2a313d; --shadow:0 10px 30px rgba(0,0,0,.45); --map-bg:#151f2b;
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#ece5d4; --panel:#f7f2e6; --panel-2:#efe8d7; --ink:#2b251b; --ink-2:#6d6350; --ink-3:#988c74;
+    --line:#d6cbb4; --accent:#a83a1e; --accent-dim:#c2593c; --indigo:#38659e; --gold:#9b7826; --green:#5f7f38;
+    --chip:#e6dec9; --shadow:0 10px 24px rgba(90,70,40,.18); --map-bg:#c6bda6; }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --panel:#1d222b; --panel-2:#232a35; --ink:#eae4d6; --ink-2:#a89e8e; --ink-3:#7a7264;
+  --line:#333a46; --accent:#d05a35; --accent-dim:#a3492e; --indigo:#6d9dd4; --gold:#d4a94f; --green:#8fae62;
+  --chip:#2a313d; --shadow:0 10px 30px rgba(0,0,0,.45); --map-bg:#151f2b;
+}
+:root[data-theme="light"]{
+  --bg:#ece5d4; --panel:#f7f2e6; --panel-2:#efe8d7; --ink:#2b251b; --ink-2:#6d6350; --ink-3:#988c74;
+  --line:#d6cbb4; --accent:#a83a1e; --accent-dim:#c2593c; --indigo:#38659e; --gold:#9b7826; --green:#5f7f38;
+  --chip:#e6dec9; --shadow:0 10px 24px rgba(90,70,40,.18); --map-bg:#c6bda6;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  font-size:14px;line-height:1.7;overflow:hidden}
+.serif{font-family:"Songti SC","Noto Serif SC","Noto Serif CJK SC","SimSun",serif}
+
+#app{display:flex;flex-direction:column;height:100vh}
+header{display:flex;align-items:baseline;gap:14px;padding:10px 18px 9px;border-bottom:1px solid var(--line);flex:none}
+.seal-mark{width:30px;height:30px;flex:none;align-self:center;border-radius:6px;background:var(--accent);
+  color:#f5ead9;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;
+  font-family:"Songti SC","Noto Serif SC",serif;box-shadow:inset 0 0 0 2px rgba(245,234,217,.55), inset 0 0 0 3.5px var(--accent)}
+h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.06em;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+h1 small{font-weight:400;color:var(--ink-2);font-size:13px;letter-spacing:.02em;margin-left:10px}
+#main{display:flex;flex:1;min-height:0}
+#mapwrap{position:relative;flex:1;min-width:0;background:var(--map-bg)}
+canvas#map,canvas#ovl{position:absolute;inset:0;width:100%;height:100%;display:block}
+#ovl{cursor:grab}
+#ovl.grabbing{cursor:grabbing} #ovl.pick{cursor:crosshair}
+
+.mapchip{position:absolute;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(4px);
+  border:1px solid var(--line);border-radius:7px;padding:4px 10px;font-size:12px;color:var(--ink-2);pointer-events:none}
+#readout{right:12px;bottom:12px;font-variant-numeric:tabular-nums;min-width:200px;text-align:right}
+#readout b{color:var(--ink);font-weight:600}
+#attrib{left:12px;bottom:12px;font-size:10.5px;color:var(--ink-3)}
+#scalebar{left:12px;bottom:38px;padding:3px 10px 5px}
+#scalebar .bar{height:4px;border:1.5px solid var(--ink-2);border-top:none;margin-top:2px}
+#zoomctl{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+#zoomctl button{width:32px;height:32px;border-radius:7px;border:1px solid var(--line);background:var(--panel);
+  color:var(--ink);font-size:16px;cursor:pointer;box-shadow:var(--shadow)}
+#zoomctl button:hover{background:var(--panel-2)}
+#stepfloat{position:absolute;left:12px;top:12px;max-width:min(430px,60%);background:color-mix(in srgb,var(--panel) 92%,transparent);
+  backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:none}
+#stepfloat .t{font-weight:700;font-family:"Songti SC","Noto Serif SC",serif;font-size:15px}
+
+#panel{width:400px;flex:none;border-left:1px solid var(--line);background:var(--panel);overflow-y:auto;overscroll-behavior:contain}
+.sec{padding:14px 18px;border-bottom:1px solid var(--line)}
+.sec h2{font-size:11.5px;margin:0 0 10px;color:var(--ink-3);font-weight:600;letter-spacing:.22em;text-transform:uppercase}
+
+#steps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+#steps button{border:1px solid var(--line);background:var(--chip);color:var(--ink-2);border-radius:99px;
+  padding:4px 12px 5px;font-size:12.5px;cursor:pointer;letter-spacing:.03em}
+#steps button.on{background:var(--accent);border-color:var(--accent);color:#f7efe2;font-weight:600}
+#steps button:hover:not(.on){color:var(--ink)}
+#story h3{font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:19px;margin:2px 0 8px;letter-spacing:.03em;text-wrap:balance}
+#story p{margin:0 0 8px;color:var(--ink);font-size:13.5px;line-height:1.95;text-align:justify;
+  font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+#story p b{color:var(--accent);font-weight:700}
+#story p i{font-style:normal;color:var(--gold);font-weight:600}
+#story .hint{font-family:inherit;font-size:12px;color:var(--ink-3);border-left:2px solid var(--line);padding-left:9px;line-height:1.7}
+.navrow{display:flex;gap:8px;margin-top:12px}
+.navrow button{flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--line);background:var(--chip);
+  color:var(--ink);cursor:pointer;font-size:13px}
+.navrow button:hover{background:var(--panel-2)}
+.navrow button.primary{background:var(--accent);border-color:var(--accent);color:#f7efe2;font-weight:600}
+.navrow button:disabled{opacity:.35;cursor:default}
+
+.lay{display:flex;align-items:center;gap:9px;padding:3.5px 0;cursor:pointer;user-select:none}
+.lay input{accent-color:var(--accent);width:15px;height:15px;margin:0;flex:none}
+.lay .sw{width:14px;height:14px;border-radius:4px;flex:none}
+.lay span{font-size:13px}
+.lay small{color:var(--ink-3);margin-left:auto;font-size:11px}
+#thres{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+#thres input{flex:1;accent-color:var(--gold)}
+#thres label{font-size:12px;color:var(--ink-2);white-space:nowrap}
+#thres b{font-variant-numeric:tabular-nums;color:var(--gold)}
+
+.profbtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.profbtns button{border:1px solid var(--line);background:var(--chip);color:var(--ink-2);border-radius:7px;
+  padding:5px 10px;font-size:12px;cursor:pointer}
+.profbtns button.on{border-color:var(--accent);color:var(--accent);font-weight:600;background:transparent}
+.profbtns button:hover:not(.on){color:var(--ink)}
+#profchart{width:100%;height:150px;display:block;border:1px solid var(--line);border-radius:8px;background:var(--panel-2)}
+#profstats{font-size:12px;color:var(--ink-2);margin-top:7px;font-variant-numeric:tabular-nums;min-height:18px}
+#profstats b{color:var(--ink)}
+
+#legend canvas{width:100%;height:14px;border-radius:4px;display:block}
+#legend .ticks{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-top:3px;font-variant-numeric:tabular-nums}
+.src{font-size:11px;color:var(--ink-3);line-height:1.8}
+.src a{color:var(--ink-3)}
+
+.seals{display:flex;gap:60px;justify-content:center;margin:14px 0 4px}
+.seal{width:74px;height:74px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-family:"Songti SC","Noto Serif SC",serif;font-size:24px;font-weight:800;letter-spacing:2px;
+  writing-mode:vertical-rl;text-orientation:upright;position:relative}
+.seal.jun{background:transparent;color:var(--gold);border:2.5px solid var(--gold);box-shadow:inset 0 0 0 2px transparent}
+.seal.gong{background:var(--accent);color:#f5ead9;box-shadow:inset 0 0 0 2.5px rgba(245,234,217,.6)}
+.seal em{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);writing-mode:horizontal-tb;
+  font-style:normal;font-size:11px;color:var(--ink-3);white-space:nowrap;letter-spacing:.1em}
+.seals{margin-bottom:30px}
+
+@media (max-width: 880px){
+  body{overflow:auto}
+  #app{height:auto}
+  #main{flex-direction:column}
+  #mapwrap{height:min(62vh, 96vw);flex:none}
+  #panel{width:100%;border-left:none;border-top:1px solid var(--line)}
+  #stepfloat{display:none !important}
+  #readout{display:none}
+  #attrib{max-width:calc(100% - 24px);font-size:9.5px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none !important;transition:none !important} }
+</style>
+
+<div id="app">
+<header>
+  <div class="seal-mark">限</div>
+  <h1>山河之限<small>为什么中国吞得下山东，却始终吞不下朝鲜 —— 一张地形图的解释</small></h1>
+</header>
+<div id="main">
+  <div id="mapwrap">
+    <canvas id="map"></canvas>
+    <canvas id="ovl"></canvas>
+    <div id="zoomctl">
+      <button id="zin" title="放大">＋</button>
+      <button id="zout" title="缩小">－</button>
+      <button id="zfit" title="复位视图" style="font-size:13px">⌂</button>
+    </div>
+    <div class="mapchip" id="scalebar"><span id="sblabel">100 km</span><div class="bar" id="sbbar"></div></div>
+    <div class="mapchip" id="attrib">地形 Mapzen/AWS Terrain Tiles · 边界与河流 Natural Earth · 历史路线为概略示意</div>
+    <div class="mapchip" id="readout">移动鼠标读取海拔</div>
+  </div>
+  <div id="panel">
+    <div class="sec" id="storysec">
+      <h2>六步看懂 · SIX STEPS</h2>
+      <div id="steps"></div>
+      <div id="story"></div>
+      <div class="navrow">
+        <button id="prev">← 上一步</button>
+        <button id="next" class="primary">下一步 →</button>
+      </div>
+    </div>
+    <div class="sec">
+      <h2>图层 · LAYERS</h2>
+      <div id="layers"></div>
+      <div id="thres">
+        <label>通行海拔上限 <b id="tval">200 m</b></label>
+        <input type="range" id="tslider" min="150" max="1500" step="25" value="200">
+      </div>
+    </div>
+    <div class="sec">
+      <h2>地形剖面 · PROFILE</h2>
+      <div class="profbtns">
+        <button id="pfA">洛阳 → 临淄</button>
+        <button id="pfB">蓟(北京) → 平壤 · 陆路</button>
+        <button id="pfC">自选两点</button>
+      </div>
+      <canvas id="profchart"></canvas>
+      <div id="profstats">选择一条剖面线，看看两条路各要翻越什么。</div>
+    </div>
+    <div class="sec" id="legend">
+      <h2>海拔 · ELEVATION</h2>
+      <canvas id="legcv"></canvas>
+      <div class="ticks"><span>海</span><span>0</span><span>200</span><span>500</span><span>1000</span><span>2000</span><span>3000 m</span></div>
+    </div>
+    <div class="sec src">
+      高程：Mapzen Terrain Tiles（AWS 开放数据，SRTM/GMTED/ETOPO1 合成，约 1.9 km/像素）·
+      边界、河流：Natural Earth ·
+      历史叙述以《隋书》《资治通鉴》《三国史记》等为据，进军路线为概略复原，仅供理解地形逻辑。
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+"use strict";
+/* ================= data ================= */
+const META = __META__;
+const HEIGHT_B64 = "__HEIGHT_B64__";
+const BORDERS = __BORDERS__;
+const RIVERS = __RIVERS__;
+/* Natural Earth has no internal North-Korean rivers; add approximate courses (示意) */
+RIVERS.rivers.push(
+  {name:"Taedong (approx)", lines:[[[126.85,39.95],[126.45,39.55],[126.10,39.20],[125.80,39.05],[125.60,38.95],[125.35,38.71]]]},
+  {name:"Chongchon (approx)", lines:[[[126.65,40.40],[126.25,40.10],[125.95,39.90],[125.60,39.72],[125.20,39.58]]]}
+);
+
+/* ---------- geo helpers (Web Mercator) ---------- */
+const mercX = lon => (lon + 180) / 360;
+const mercY = lat => { const r = lat * Math.PI / 180; return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2; };
+const MX0 = mercX(META.lonMin), MX1 = mercX(META.lonMax);
+const MY0 = mercY(META.latMax), MY1 = mercY(META.latMin);
+const W = META.width, H = META.height;
+const geoToImg = (lon, lat) => [ (mercX(lon)-MX0)/(MX1-MX0)*W, (mercY(lat)-MY0)/(MY1-MY0)*H ];
+const imgToGeo = (x, y) => {
+  const lon = (x/W)*(MX1-MX0)*360 + (MX0*360 - 180);
+  const my = MY0 + (y/H)*(MY1-MY0);
+  const lat = Math.atan(Math.sinh(Math.PI*(1-2*my))) * 180/Math.PI;
+  return [lon, lat];
+};
+const havKm = (a, b) => {
+  const R=6371, d=Math.PI/180;
+  const dLa=(b[1]-a[1])*d, dLo=(b[0]-a[0])*d;
+  const s=Math.sin(dLa/2)**2 + Math.cos(a[1]*d)*Math.cos(b[1]*d)*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(s));
+};
+
+/* ---------- elevation color ramp ---------- */
+const RAMP = [
+  [-800,[26,44,66]], [-2000e-1,[38,64,92]], [-60,[62,96,126]], [-8,[104,140,163]], [0,[136,167,181]],
+  [1,[104,140,96]], [60,[126,158,104]], [200,[164,180,116]], [450,[199,186,131]],
+  [800,[188,153,104]], [1400,[160,116,84]], [2200,[136,96,84]], [2900,[196,186,182]], [4000,[248,248,248]]
+];
+function rampColor(h){
+  if (h <= RAMP[0][0]) return RAMP[0][1];
+  for (let i=1;i<RAMP.length;i++){
+    if (h <= RAMP[i][0]){
+      const [h0,c0]=RAMP[i-1],[h1,c1]=RAMP[i], t=(h-h0)/(h1-h0);
+      return [c0[0]+(c1[0]-c0[0])*t, c0[1]+(c1[1]-c0[1])*t, c0[2]+(c1[2]-c0[2])*t];
+    }
+  }
+  return RAMP[RAMP.length-1][1];
+}
+
+/* ---------- state ---------- */
+let heights = null;               // Float32Array W*H
+const baseCv = document.createElement('canvas');   baseCv.width=W; baseCv.height=H;
+const lowCv  = document.createElement('canvas');   lowCv.width=W;  lowCv.height=H;
+const reachCv = document.createElement('canvas');  reachCv.width=W; reachCv.height=H;
+let thresholdM = 200;
+
+const layers = {
+  lowland:{on:false, name:"连续低地（≤ 通行海拔）", sw:"#8fae62"},
+  reach:  {on:false, name:"从洛阳可达的低地", sw:"#d4a94f"},
+  barrier:{on:true,  name:"山脉与地理屏障", sw:"#c86a4a"},
+  rivers: {on:true,  name:"江河", sw:"#6b93bd"},
+  cities: {on:true,  name:"城邑与要塞", sw:"#e0d6c2"},
+  routes: {on:false, name:"进军路线（前221 / 612年）", sw:"#d05a35"},
+  borders:{on:false, name:"现代国界（参考）", sw:"#888"},
+};
+
+/* ---------- map annotations ---------- */
+const CITIES = [
+  {n:"长安", g:[108.94,34.34], cap:1},
+  {n:"洛阳", g:[112.45,34.62], cap:1},
+  {n:"蓟（北京）", g:[116.40,39.90], cap:1},
+  {n:"济南", g:[117.02,36.65]},
+  {n:"临淄", g:[118.31,36.83]},
+  {n:"曲阜", g:[116.99,35.60]},
+  {n:"登州（蓬莱）", g:[120.76,37.81]},
+  {n:"山海关", g:[119.75,39.99], fort:1},
+  {n:"柳城（朝阳）", g:[120.45,41.57], fort:1},
+  {n:"锦州", g:[121.13,41.10], fort:1},
+  {n:"辽东城（辽阳）", g:[123.17,41.27], fort:1},
+  {n:"安市城", g:[122.72,40.86], fort:1},
+  {n:"国内城（集安）", g:[126.19,41.12], fort:1},
+  {n:"平壤", g:[125.75,39.03], cap:1},
+  {n:"开城", g:[126.55,37.97]},
+  {n:"汉城（首尔）", g:[126.98,37.57], cap:1},
+  {n:"庆州（新罗）", g:[129.22,35.84]},
+];
+const TERRA = [ // terrain / water labels: [name, lon, lat, rot(deg), size, kind]
+  ["太行山",113.55,37.60,-72,15,"mtn"], ["燕山",117.20,40.75,-6,15,"mtn"],
+  ["秦岭",106.9,33.75,-8,14,"mtn"], ["黄土高原",108.9,36.9,0,14,"reg"],
+  ["泰沂山地",117.75,36.18,-4,13,"mtn"], ["千山山脉",123.05,40.42,-38,13,"mtn"],
+  ["长白山",128.05,42.00,-30,15,"mtn"], ["盖马高原",127.35,40.55,0,14,"mtn"],
+  ["太白山脉",128.85,37.35,-72,13,"mtn"], ["华北平原",115.70,35.60,0,17,"plain"],
+  ["辽河平原",122.55,41.85,0,12,"plain"],
+  ["渤海",119.90,38.75,0,15,"sea"], ["黄海",123.30,35.70,0,15,"sea"], ["日本海",131.40,40.20,0,15,"sea"],
+  ["黄河",114.6,35.25,-20,12,"riv"], ["鸭绿江",125.35,40.60,-35,12,"riv"],
+  ["清川江",125.95,39.86,-38,11,"riv"], ["大同江",126.35,39.25,-30,11,"riv"], ["汉江",127.55,37.45,-15,11,"riv"],
+];
+/* campaign routes */
+const R_QIN = { color:"gold", name:"秦灭齐 · 王贲自燕南下（前221年）",
+  pts:[[116.40,39.75],[116.75,38.70],[117.35,37.60],[117.90,37.10],[118.31,36.83]] };
+const R_SUI = { color:"accent", name:"隋军陆路 · 出临渝关经柳城（612年）",
+  pts:[[112.45,34.62],[113.80,36.00],[114.90,37.80],[116.40,39.90],[118.20,39.90],[119.10,40.35],
+       [119.90,41.00],[120.45,41.57],[121.60,41.60],[122.45,41.42],[123.17,41.27]] };
+const R_YALU = { color:"accent", name:"宇文述九军渡鸭绿江（30.5万人）",
+  pts:[[123.17,41.27],[123.95,40.85],[124.65,40.42],[125.05,40.10],[125.55,39.85],[125.90,39.55],[125.75,39.03]] };
+const R_SEA = { color:"indigo", name:"来护儿江淮水军 · 海路（以精甲4万趋平壤）",
+  pts:[[120.76,37.81],[121.90,38.05],[123.20,38.30],[124.40,38.55],[125.30,38.72],[125.75,39.03]] };
+const SALSU = {g:[125.72,39.62], label:"萨水（清川江）之战 · 生还约2700人"};
+const CORRIDOR = {a:[119.55,40.05], b:[121.4,41.0], label:"辽西走廊 · 山海之间的窄带"};
+const LIAOZE = {g:[122.35,41.20], rx:60, ry:38, rot:-20, label:"辽泽（古代沼泽带）"};
+
+/* ---------- story steps ---------- */
+const STEPS = [
+ {t:"两个方向，两种命运", ly:{lowland:0,reach:0,barrier:1,rivers:1,cities:1,routes:0,borders:0}, view:null,
+  html:`<p>从洛阳到山东的临淄约 <i>590 公里</i>；从北京到平壤，直线也只有约 <i>810 公里</i>。距离相差并不悬殊，结局却天差地别：山东自公元前221年起成为帝国郡县两千余年；而在朝鲜半岛方向，除了汉四郡那四百年（且从未及于全岛），中原王朝一次次倾国远征，却再未能建立持久的直接统治。</p>
+  <p>把政区图换成<b>地形图</b>，答案立刻浮现。</p>
+  <p class="hint">地图可拖动、滚轮缩放；右侧图层可自由开关。点击「下一步」开始。</p>`},
+ {t:"华北平原：一张摊开的桌面", ly:{lowland:1,reach:0,barrier:1,rivers:1,cities:1,routes:0,borders:0}, view:[116.3,36.3,2.05],
+  html:`<p>黄河冲出太行山后，用泥沙堆出约 <i>30万平方公里</i>、大部分海拔不足 <i>50米</i> 的巨型平原（绿色高亮）。从洛阳到山东无一道天然屏障：步军旬月可达，粮船顺河直抵，政令、驻军、税吏以同样的速度铺开。</p>
+  <p>泰山虽高 <i>1532米</i>，泰沂山地却是平原中的<b>孤岛</b>——可绕行、可合围，撑不起一个独立政权的纵深。前221年王贲率秦军自燕地南下，齐王建不战而降；秦设齐郡、琅琊郡，山东从此进入郡县序列，再未成为分离的地理单元。</p>`},
+ {t:"出关之路：漏斗与瓶颈", ly:{lowland:1,reach:0,barrier:1,rivers:1,cities:1,routes:0,borders:0}, view:[121.0,40.7,3.4],
+  html:`<p>向东北方向则是另一套地形。<b>燕山</b>横亘华北平原北缘，把中原与东北隔开。燕山与渤海之间的<b>辽西走廊</b>长约 <i>185公里</i>、宽仅 <i>8～15公里</i>；而在隋唐时代它还远非坦途：傍海的<b>临渝关道</b>逢雨季即成泥淖，翻山的<b>卢龙塞道</b>（出喜峰口、沿滦河—大凌河谷经柳城）更窄更险——条条出关之路都是瓶颈，辽金以后滨海走廊才成为正途。</p>
+  <p>出了山还没完：辽河下游是古称「<b>辽泽</b>」的大片沼泽（虚线圈），史载「泥淖二百余里，人马不可通」，唐太宗回军时须剪草填道、以车为梁。整个帝国的战争机器，必须从这一根细管里挤过去——补给线被拉得越长越细，就越容易被切断。</p>`},
+ {t:"半岛门口，层层设防", ly:{lowland:1,reach:0,barrier:1,rivers:1,cities:1,routes:0,borders:0}, view:[126.2,40.2,2.9],
+  html:`<p>渡过辽河，迎面是<b>千山山脉</b>和高句丽经营数百年的山城群：辽东城、安市城……每一座都要仰攻。再向东是<b>鸭绿江</b>；江对岸，<b>长白山地</b>与平均海拔约 <i>1300米</i> 的<b>盖马高原</b>把半岛北部堆成一座天然堡垒，只在西海岸留出一条窄窄的滨海走廊，<b>清川江、大同江</b>再横切两刀。</p>
+  <p>防守方只需依次守住每一道门；进攻方要在每一道门前流血、掉队、断粮——而冬季封冻一到，战役窗口便宣告关闭。</p>`},
+ {t:"帝国的极限：数字会说话", ly:{lowland:0,reach:0,barrier:1,rivers:1,cities:1,routes:1,borders:0}, view:[121.3,39.3,1.75],
+  html:`<p>并非没人试过。汉武帝前108年水陆并进灭卫氏朝鲜、设乐浪等四郡——那是半岛政权最弱的年代；此后四百年郡县步步内缩，<i>313年</i>乐浪陷落，直辖窗口永久关闭。598年隋文帝首征，水陆30万未及接战，便因霖雨、疫病与渤海风暴「死者十之八九」。</p>
+  <p><i>612年</i>，隋炀帝调集战兵 <i>约113万</i>（号称二百万，民夫倍之）再征。大军顿于辽东城下；宇文述率九军 <i>30.5万人</i> 渡辽东进、直扑平壤，士卒人负百日粮、不堪重负沿途埋弃，渡鸭绿江时已然乏食；退兵至<b>萨水</b>被乙支文德半渡而击，还至辽东城者<b>仅约2700人</b>（红叉处）。三年三征，隋朝因此民变蜂起而亡。</p>
+  <p>唐太宗645年亲征，止步<b>安市城</b>；668年唐终于联合新罗灭高句丽、于平壤设安东都护府——但仅 <i>8年后</i>（676年）便在新罗反抗与吐蕃压力下内迁辽东。倾两朝之力，得而复失。</p>`},
+ {t:"均衡：郡县，还是朝贡", ly:{lowland:0,reach:1,barrier:1,rivers:1,cities:1,routes:0,borders:1}, view:null,
+  html:`<p>经济学家博尔丁称之为「<b>力量损耗梯度</b>」：实力随距离与地形衰减。山东方向，平原让衰减近乎为零——税赋远大于统治成本，于是<b>郡县直辖</b>。朝鲜方向，每一里补给线都在漏水：占领的成本远高于收益，而一个称臣纳贡、不构成威胁的邻居几乎零成本。</p>
+  <p>于是双方在「<b>册封—朝贡</b>」上达成持续千年的均衡：中国得体面与边境安全，朝鲜得自治与贸易。1592年日本入侵朝鲜，明朝宁可出兵苦战七年替朝鲜复国，也未尝试顺势占领——地形早已把这笔账算好了。</p>
+  <div class="seals">
+    <div class="seal jun">郡县<em>山东 · 直辖两千年</em></div>
+    <div class="seal gong">朝贡<em>朝鲜 · 称臣而不内属</em></div>
+  </div>
+  <p class="hint">试试拖动「通行海拔上限」滑杆：金色区域是从洛阳出发、不越过该海拔所能连续到达的土地。注意它如何铺满华北、挤过辽西走廊、又在半岛上缩成一条细线。</p>`},
+];
+
+/* ================= boot ================= */
+const mapCv = document.getElementById('map'), ovlCv = document.getElementById('ovl');
+const mctx = mapCv.getContext('2d'), octx = ovlCv.getContext('2d');
+let view = {cx: W/2, cy: H/2, scale: 0.6};
+let fitScale = 0.6, dpr = 1, cw = 0, ch = 0;
+let anim = null, hoverPx = null;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const img = new Image();
+img.onload = () => {
+  const c = document.createElement('canvas'); c.width=W; c.height=H;
+  const x = c.getContext('2d', {willReadFrequently:true});
+  x.drawImage(img, 0, 0);
+  const d = x.getImageData(0,0,W,H).data;
+  heights = new Float32Array(W*H);
+  for (let i=0,p=0;i<W*H;i++,p+=4) heights[i] = (d[p]*256 + d[p+1])*4 - 800;
+  renderBase();
+  renderLowland();
+  renderReach();
+  legend();
+  resize();
+  setStep(0, true);
+};
+img.src = "data:image/png;base64," + HEIGHT_B64;
+
+/* ---------- terrain rendering ---------- */
+function renderBase(){
+  const ctx = baseCv.getContext('2d');
+  const out = ctx.createImageData(W, H);
+  const o = out.data;
+  const mpp = new Float32Array(H);            // meters per pixel per row
+  for (let y=0;y<H;y++){
+    const lat = imgToGeo(0, y+0.5)[1];
+    mpp[y] = 2445.98 * Math.cos(lat*Math.PI/180) * 2; // 2*cell for central diff
+  }
+  const ZEX = 1.25, alt = 45*Math.PI/180;
+  const sinAlt = Math.sin(alt), cosAlt = Math.cos(alt);
+  const azm = (360 - 315 + 90) * Math.PI/180;
+  for (let y=0;y<H;y++){
+    const y0 = Math.max(y-1,0)*W, y1 = Math.min(y+1,H-1)*W, yr = y*W;
+    for (let x=0;x<W;x++){
+      const xl = Math.max(x-1,0), xr = Math.min(x+1,W-1);
+      const h = heights[yr+x];
+      const dzdx = (heights[yr+xr]-heights[yr+xl]) * ZEX / mpp[y];
+      const dzdy = (heights[y1+x]-heights[y0+x]) * ZEX / mpp[y];
+      const slope = Math.atan(Math.hypot(dzdx,dzdy));
+      const aspect = Math.atan2(dzdy, -dzdx);
+      let hs = sinAlt*Math.cos(slope) + cosAlt*Math.sin(slope)*Math.cos(azm-aspect);
+      if (hs<0) hs=0;
+      const c = rampColor(h);
+      let f;
+      if (h>0){
+        f = 0.55 + 0.55*hs;
+        // coastal edge: land pixel adjacent to sea -> darken
+        if (heights[yr+xl]<=0 || heights[yr+xr]<=0 || heights[y0+x]<=0 || heights[y1+x]<=0) f *= 0.62;
+      } else {
+        f = 0.88 + 0.14*hs;
+      }
+      const p=(yr+x)*4;
+      o[p]   = Math.min(255, c[0]*f);
+      o[p+1] = Math.min(255, c[1]*f);
+      o[p+2] = Math.min(255, c[2]*f);
+      o[p+3] = 255;
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function renderLowland(){
+  const ctx = lowCv.getContext('2d');
+  const out = ctx.createImageData(W, H), o = out.data;
+  for (let i=0;i<W*H;i++){
+    const h = heights[i];
+    if (h>0 && h<=thresholdM){ const p=i*4; o[p]=124; o[p+1]=176; o[p+2]=72; o[p+3]=96; }
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function renderReach(){
+  // BFS flood fill at full resolution from Luoyang basin seed
+  const g = heights;
+  const seed = geoToImg(113.0, 34.75).map(v=>v|0);
+  const vis = new Uint8Array(W*H);
+  const q = new Int32Array(W*H); let qh=0, qt=0;
+  const s0 = seed[1]*W + seed[0];
+  if (g[s0] > 0 && g[s0] <= thresholdM){ vis[s0]=1; q[qt++]=s0; }
+  while (qh<qt){
+    const i = q[qh++], x = i%W, y = (i/W)|0;
+    if (x>0){const j=i-1; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+    if (x<W-1){const j=i+1; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+    if (y>0){const j=i-W; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+    if (y<H-1){const j=i+W; if(!vis[j]&&g[j]>0&&g[j]<=thresholdM){vis[j]=1;q[qt++]=j;}}
+  }
+  const ctx = reachCv.getContext('2d');
+  const out = ctx.createImageData(W,H), o = out.data;
+  for (let i=0;i<W*H;i++){
+    if (!vis[i]) continue;
+    const p=i*4; o[p]=232; o[p+1]=164; o[p+2]=44; o[p+3]=165;
+    // brighten edges of the reachable region so thin corridors pop
+    const x=i%W, y=(i/W)|0;
+    if ((x>0&&!vis[i-1])||(x<W-1&&!vis[i+1])||(y>0&&!vis[i-W])||(y<H-1&&!vis[i+W])){ o[p]=255; o[p+1]=196; o[p+2]=64; o[p+3]=235; }
+  }
+  ctx.putImageData(out,0,0);
+}
+
+/* ---------- legend ---------- */
+function legend(){
+  const cv = document.getElementById('legcv');
+  const w = cv.clientWidth || 340; cv.width=w; cv.height=14;
+  const x = cv.getContext('2d');
+  // piecewise: sea band 15%, then land 0..3200 nonlinear (match tick spacing evenly)
+  const ticksH=[0,200,500,1000,2000,3000];
+  const seaW = w/7;
+  for (let px=0;px<seaW;px++){ const h=-800 + (px/seaW)*800; const c=rampColor(h);
+    x.fillStyle=`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; x.fillRect(px,0,1.5,14); }
+  const segW=(w-seaW)/(ticksH.length-1);
+  for (let s=0;s<ticksH.length-1;s++){
+    for (let px=0;px<segW;px++){ const h=ticksH[s]+(px/segW)*(ticksH[s+1]-ticksH[s]); const c=rampColor(h);
+      x.fillStyle=`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; x.fillRect(seaW+s*segW+px,0,1.5,14); }
+  }
+}
+
+/* ---------- view / draw ---------- */
+function resize(){
+  dpr = Math.min(window.devicePixelRatio||1, 2);
+  const r = mapCv.parentElement.getBoundingClientRect();
+  cw = r.width; ch = r.height;
+  for (const cv of [mapCv, ovlCv]){ cv.width=cw*dpr; cv.height=ch*dpr; }
+  fitScale = Math.min(cw/W, ch/H);
+  view.scale = Math.max(view.scale, fitScale*0.85);
+  legend();
+  draw();
+}
+window.addEventListener('resize', resize);
+
+const imgToScr = (x,y) => [ (x-view.cx)*view.scale + cw/2, (y-view.cy)*view.scale + ch/2 ];
+const scrToImg = (sx,sy) => [ (sx-cw/2)/view.scale + view.cx, (sy-ch/2)/view.scale + view.cy ];
+const geoToScr = (lon,lat) => { const [x,y]=geoToImg(lon,lat); return imgToScr(x,y); };
+
+function clampView(){
+  view.scale = Math.min(Math.max(view.scale, fitScale*0.85), 12);
+  const hw = cw/2/view.scale, hh = ch/2/view.scale;
+  if (2*hw >= W) view.cx = W/2; else view.cx = Math.min(Math.max(view.cx, hw), W-hw);
+  if (2*hh >= H) view.cy = H/2; else view.cy = Math.min(Math.max(view.cy, hh), H-hh);
+}
+
+let needsDraw = false;
+function draw(){ needsDraw = true; }
+function frame(t){
+  requestAnimationFrame(frame);
+  if (anim){
+    const k = Math.min(1, (t-anim.t0)/anim.dur);
+    const e = k<.5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+    view.cx = anim.from[0]+(anim.to[0]-anim.from[0])*e;
+    view.cy = anim.from[1]+(anim.to[1]-anim.from[1])*e;
+    view.scale = Math.exp(Math.log(anim.from[2])+(Math.log(anim.to[2])-Math.log(anim.from[2]))*e);
+    if (k>=1) anim=null;
+    needsDraw = true;
+  }
+  if (layers.routes.on && !reduceMotion) needsDraw = true;
+  if (!needsDraw) return;
+  needsDraw = false;
+  clampView();
+  paint(t);
+}
+requestAnimationFrame(frame);
+
+function flyTo(lon, lat, scale, dur=1100){
+  const tgt = lon===null ? [W/2, H/2, fitScale] : [...geoToImg(lon,lat), scale*fitScale];
+  if (reduceMotion || dur<=0){ anim=null; view={cx:tgt[0],cy:tgt[1],scale:tgt[2]}; draw(); return; }
+  anim = {from:[view.cx,view.cy,view.scale], to:tgt, t0:performance.now(), dur};
+}
+
+function paint(now){
+  mctx.setTransform(dpr,0,0,dpr,0,0);
+  mctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--map-bg').trim() || "#1a2c42";
+  mctx.fillRect(0,0,cw,ch);
+  const [x0,y0] = imgToScr(0,0);
+  const s = view.scale;
+  mctx.imageSmoothingEnabled = true;
+  mctx.imageSmoothingQuality = "high";
+  mctx.save();
+  mctx.shadowColor = "rgba(0,0,0,.55)"; mctx.shadowBlur = 34;
+  mctx.drawImage(baseCv, x0, y0, W*s, H*s);
+  mctx.restore();
+  if (layers.lowland.on) mctx.drawImage(lowCv, x0, y0, W*s, H*s);
+  if (layers.reach.on)   mctx.drawImage(reachCv, x0, y0, W*s, H*s);
+
+  /* overlay canvas */
+  octx.setTransform(dpr,0,0,dpr,0,0);
+  octx.clearRect(0,0,cw,ch);
+  octx.lineJoin = "round"; octx.lineCap = "round";
+  const css = getComputedStyle(document.documentElement);
+  const C = {
+    accent: css.getPropertyValue('--accent').trim() || '#d05a35',
+    indigo: css.getPropertyValue('--indigo').trim() || '#6b93bd',
+    gold: css.getPropertyValue('--gold').trim() || '#d4a94f',
+  };
+
+  if (layers.borders.on){
+    octx.strokeStyle = "rgba(120,120,120,.85)"; octx.lineWidth = 1.1; octx.setLineDash([5,4]);
+    for (const line of BORDERS.lines) path(line), octx.stroke();
+    octx.setLineDash([]);
+  }
+  if (layers.rivers.on){
+    const rw = Math.min(2.6, 1.35 + s*.3);
+    for (const rv of RIVERS.rivers) for (const line of rv.lines){
+      path(line);
+      octx.strokeStyle = "rgba(240,248,255,.28)"; octx.lineWidth = rw+1.3; octx.stroke();
+      octx.strokeStyle = "rgba(62,124,176,.95)"; octx.lineWidth = rw; octx.stroke();
+    }
+  }
+  if (layers.barrier.on){
+    /* Liaoze swamp ellipse */
+    const [ex,ey] = geoToScr(LIAOZE.g[0], LIAOZE.g[1]);
+    octx.save(); octx.translate(ex,ey); octx.rotate(LIAOZE.rot*Math.PI/180);
+    octx.strokeStyle = "rgba(90,140,185,.9)"; octx.setLineDash([4,4]); octx.lineWidth=1.3;
+    octx.beginPath(); octx.ellipse(0,0,LIAOZE.rx*s/2.2,LIAOZE.ry*s/2.2,0,0,7); octx.stroke();
+    octx.restore(); octx.setLineDash([]);
+    if (s > fitScale*1.6) haloText("辽泽（沼泽）", ex, ey, {size:11, color:"rgba(150,190,225,1)", style:"italic"});
+    /* corridor bracket */
+    const [ax,ay] = geoToScr(CORRIDOR.a[0], CORRIDOR.a[1]);
+    const [bx,by] = geoToScr(CORRIDOR.b[0], CORRIDOR.b[1]);
+    if (s > fitScale*1.6){
+      octx.strokeStyle = C.accent; octx.lineWidth=1.6; octx.setLineDash([2,3]);
+      octx.beginPath(); octx.moveTo(ax,ay); octx.lineTo(bx,by); octx.stroke(); octx.setLineDash([]);
+      arrowHead(ax,ay,bx,by,C.accent);
+      haloText("辽西走廊", (ax+bx)/2+10, (ay+by)/2+14, {size:12.5, color:C.accent, bold:1, rot:-28});
+    }
+  }
+  /* terrain labels */
+  octx.textAlign="center"; octx.textBaseline="middle";
+  for (const [n,lon,lat,rot,size,kind] of TERRA){
+    if (!layers.barrier.on && (kind==="mtn"||kind==="reg")) continue;
+    if (!layers.rivers.on && kind==="riv") continue;
+    const [sx,sy] = geoToScr(lon,lat);
+    if (sx<-60||sy<-40||sx>cw+60||sy>ch+40) continue;
+    const cfg = {
+      mtn:{color:"rgba(96,58,36,.95)", halo:"rgba(255,246,226,.55)", ls:3, style:"normal"},
+      reg:{color:"rgba(96,58,36,.8)",  halo:"rgba(255,246,226,.45)", ls:5},
+      plain:{color:"rgba(58,84,38,.85)", halo:"rgba(255,250,230,.5)", ls:6},
+      sea:{color:"rgba(198,220,238,.9)", halo:"rgba(20,42,66,.35)", ls:6, style:"italic"},
+      riv:{color:"rgba(178,208,232,.95)", halo:"rgba(20,42,66,.4)", ls:2, style:"italic"},
+    }[kind];
+    const minS = {mtn:1.15, reg:1.0, plain:1.0, sea:0.9, riv:1.7}[kind];
+    if (s < fitScale*minS) continue;
+    haloText(n, sx, sy, {size:size*(kind==="riv"?1: Math.min(1.25, .8+s*.18)), color:cfg.color, halo:cfg.halo,
+      rot, ls:cfg.ls, style:cfg.style, serif:1});
+  }
+  if (layers.routes.on){
+    const dash = reduceMotion ? 0 : (now/45)%20;
+    route(R_QIN, C.gold, dash); route(R_SUI, C.accent, dash); route(R_YALU, C.accent, dash); route(R_SEA, C.indigo, dash);
+    /* Salsu X */
+    const [sx,sy] = geoToScr(SALSU.g[0], SALSU.g[1]);
+    octx.strokeStyle = C.accent; octx.lineWidth=2.6;
+    octx.beginPath(); octx.moveTo(sx-6,sy-6); octx.lineTo(sx+6,sy+6); octx.moveTo(sx+6,sy-6); octx.lineTo(sx-6,sy+6); octx.stroke();
+    if (s>fitScale*1.2) haloText(SALSU.label, sx, sy-15, {size:11, color:C.accent, bold:1});
+    if (s>fitScale*1.05){
+      routeLabel(R_QIN, C.gold, .55, -13);
+      routeLabel(R_SUI, C.accent, .42, -16);
+      routeLabel(R_SEA, C.indigo, .35, 20);
+      routeLabel(R_YALU, C.accent, .3, -14);
+    }
+  }
+  if (layers.cities.on){
+    octx.textAlign="left";
+    for (const c of CITIES){
+      const [sx,sy] = geoToScr(c.g[0], c.g[1]);
+      if (sx<-20||sy<-20||sx>cw+20||sy>ch+20) continue;
+      if (!c.cap && s < fitScale*1.35) continue;
+      const r = c.cap?4:3;
+      octx.fillStyle = c.cap? "#f3ead8" : (c.fort? "#e8b58a" : "#ded2ba");
+      octx.strokeStyle = "rgba(40,30,20,.9)"; octx.lineWidth=1.2;
+      octx.beginPath();
+      if (c.fort){ octx.rect(sx-r, sy-r, r*2, r*2); } else { octx.arc(sx,sy,r,0,7); }
+      octx.fill(); octx.stroke();
+      haloText(c.n, sx+r+3, sy, {size:11.5, color:"rgba(30,22,12,.95)", halo:"rgba(255,248,232,.7)", align:"left"});
+    }
+    octx.textAlign="center";
+  }
+  /* profile pins */
+  if (profile.line){
+    octx.strokeStyle = "rgba(240,235,220,.9)"; octx.lineWidth=1.6; octx.setLineDash([1,5]);
+    octx.beginPath();
+    profile.line.forEach((g,i)=>{ const [sx,sy]=geoToScr(g[0],g[1]); i?octx.lineTo(sx,sy):octx.moveTo(sx,sy); });
+    octx.stroke(); octx.setLineDash([]);
+    const ends = [profile.line[0], profile.line[profile.line.length-1]];
+    ["甲","乙"].forEach((ch2,i)=>{
+      const [sx,sy]=geoToScr(ends[i][0],ends[i][1]);
+      octx.fillStyle="#2b2115"; octx.beginPath(); octx.arc(sx,sy,8,0,7); octx.fill();
+      octx.strokeStyle="rgba(245,238,220,.9)"; octx.lineWidth=1.4; octx.stroke();
+      haloText(ch2, sx, sy+.5, {size:10, color:"#f3ecd9", halo:"transparent"});
+    });
+    if (profile.hoverG){
+      const [sx,sy]=geoToScr(profile.hoverG[0], profile.hoverG[1]);
+      octx.fillStyle="#fff"; octx.strokeStyle="rgba(0,0,0,.6)"; octx.lineWidth=1.5;
+      octx.beginPath(); octx.arc(sx,sy,4.5,0,7); octx.fill(); octx.stroke();
+    }
+  }
+  if (picking.on && picking.a){
+    const [sx,sy]=geoToScr(picking.a[0],picking.a[1]);
+    octx.fillStyle="#2b2115"; octx.beginPath(); octx.arc(sx,sy,8,0,7); octx.fill();
+    octx.strokeStyle="rgba(245,238,220,.9)"; octx.lineWidth=1.4; octx.stroke();
+    haloText("甲", sx, sy+.5, {size:10, color:"#f3ecd9", halo:"transparent"});
+  }
+  scalebar();
+}
+
+function path(line){
+  octx.beginPath();
+  for (let i=0;i<line.length;i++){
+    const [sx,sy] = geoToScr(line[i][0], line[i][1]);
+    i?octx.lineTo(sx,sy):octx.moveTo(sx,sy);
+  }
+}
+function route(r, color, dash){
+  octx.strokeStyle = color; octx.lineWidth = 2.4;
+  octx.setLineDash([9,6]); octx.lineDashOffset = -dash;
+  path(r.pts); octx.stroke(); octx.setLineDash([]);
+  const n = r.pts.length;
+  const [ax,ay]=geoToScr(...r.pts[n-2]), [bx,by]=geoToScr(...r.pts[n-1]);
+  arrowHead(ax,ay,bx,by,color);
+}
+function arrowHead(ax,ay,bx,by,color){
+  const a = Math.atan2(by-ay,bx-ax);
+  octx.fillStyle=color; octx.beginPath();
+  octx.moveTo(bx,by);
+  octx.lineTo(bx-11*Math.cos(a-.42), by-11*Math.sin(a-.42));
+  octx.lineTo(bx-11*Math.cos(a+.42), by-11*Math.sin(a+.42));
+  octx.closePath(); octx.fill();
+}
+function routeLabel(r, color, frac, dy){
+  const i = Math.floor(r.pts.length*frac);
+  const [sx,sy] = geoToScr(...r.pts[i]);
+  haloText(r.name, sx, sy+dy, {size:11, color, bold:1});
+}
+function haloText(txt, x, y, o={}){
+  octx.save();
+  octx.translate(x,y); if (o.rot) octx.rotate(o.rot*Math.PI/180);
+  const fam = o.serif? '"Songti SC","Noto Serif SC","SimSun",serif' : '-apple-system,"PingFang SC",sans-serif';
+  octx.font = `${o.style==="italic"?"italic ":""}${o.bold?"600 ":""}${o.size||12}px ${fam}`;
+  if (o.ls) octx.letterSpacing = o.ls+"px";
+  if (o.align) octx.textAlign = o.align;
+  octx.lineWidth = 3; octx.strokeStyle = o.halo || "rgba(255,248,230,.55)";
+  if (o.halo!=="transparent") octx.strokeText(txt, 0, 0);
+  octx.fillStyle = o.color || "#333"; octx.fillText(txt, 0, 0);
+  octx.letterSpacing = "0px";
+  if (o.align) octx.textAlign = "center";
+  octx.restore();
+}
+function scalebar(){
+  const g1 = imgToGeo(view.cx, view.cy);
+  const mPerImgPx = 40075016*(MX1-MX0)/W * Math.cos(g1[1]*Math.PI/180);
+  const mPerScrPx = mPerImgPx/view.scale;
+  const targets=[20,50,100,200,300,500,800];
+  let km=100;
+  for (const t of targets){ if (t*1000/mPerScrPx <= 160){ km=t; } }
+  const px = km*1000/mPerScrPx;
+  document.getElementById('sblabel').textContent = km + " km";
+  document.getElementById('sbbar').style.width = px.toFixed(0)+"px";
+}
+
+/* ---------- interactions ---------- */
+let dragging=false, lastP=null, moved=false;
+const touches = new Map(); let pinch=null;
+ovlCv.style.touchAction = "none";
+ovlCv.addEventListener('pointerdown', e=>{
+  touches.set(e.pointerId, [e.clientX,e.clientY]);
+  if (touches.size===2){
+    const [a,b]=[...touches.values()];
+    pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]), scale:view.scale}; dragging=false;
+  } else {
+    dragging=true; moved=false; lastP=[e.clientX,e.clientY];
+  }
+  ovlCv.setPointerCapture(e.pointerId);
+  if(!picking.on) ovlCv.classList.add('grabbing');
+});
+ovlCv.addEventListener('pointermove', e=>{
+  const r = ovlCv.getBoundingClientRect();
+  const sx=e.clientX-r.left, sy=e.clientY-r.top;
+  if (touches.has(e.pointerId)) touches.set(e.pointerId, [e.clientX,e.clientY]);
+  if (pinch && touches.size===2){
+    const [a,b]=[...touches.values()];
+    const d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const mx=(a[0]+b[0])/2-r.left, my=(a[1]+b[1])/2-r.top;
+    const [ix,iy]=scrToImg(mx,my);
+    view.scale = Math.min(Math.max(pinch.scale*d/pinch.d, fitScale*0.85), 12);
+    view.cx = ix-(mx-cw/2)/view.scale; view.cy = iy-(my-ch/2)/view.scale;
+    anim=null; draw(); moved=true;
+    return;
+  }
+  if (dragging && lastP){
+    const dx=e.clientX-lastP[0], dy=e.clientY-lastP[1];
+    if (Math.abs(dx)+Math.abs(dy)>2) moved=true;
+    view.cx -= dx/view.scale; view.cy -= dy/view.scale;
+    lastP=[e.clientX,e.clientY]; anim=null; draw();
+  }
+  hoverPx=[sx,sy];
+  const [ix,iy]=scrToImg(sx,sy);
+  const ro=document.getElementById('readout');
+  if (heights && ix>=0&&iy>=0&&ix<W&&iy<H){
+    const h = heights[(iy|0)*W+(ix|0)];
+    const [lon,lat]=imgToGeo(ix,iy);
+    ro.innerHTML = `${lon.toFixed(2)}°E ${lat.toFixed(2)}°N · ` + (h>0?`海拔 <b>${Math.round(h)} m</b>`:`海深 <b>${Math.round(-h)} m</b>`);
+  } else ro.textContent="—";
+});
+ovlCv.addEventListener('pointercancel', e=>{
+  touches.delete(e.pointerId);
+  if (touches.size<2) pinch=null;
+  dragging=false; ovlCv.classList.remove('grabbing');
+});
+ovlCv.addEventListener('pointerup', e=>{
+  touches.delete(e.pointerId);
+  if (touches.size<2) pinch=null;
+  ovlCv.classList.remove('grabbing');
+  dragging=false;
+  if (!moved && picking.on){
+    const r = ovlCv.getBoundingClientRect();
+    const [ix,iy]=scrToImg(e.clientX-r.left, e.clientY-r.top);
+    const g = imgToGeo(ix,iy);
+    if (!picking.a){ picking.a=g; draw(); }
+    else {
+      const a=picking.a; picking.on=false; picking.a=null;
+      ovlCv.classList.remove('pick');
+      runProfile([a,g], `自选剖面`);
+    }
+  }
+});
+ovlCv.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const r = ovlCv.getBoundingClientRect();
+  const sx=e.clientX-r.left, sy=e.clientY-r.top;
+  const [ix,iy]=scrToImg(sx,sy);
+  const f = Math.exp(-e.deltaY*0.0016);
+  view.scale*=f;
+  view.scale = Math.min(Math.max(view.scale, fitScale*0.85), 12);
+  view.cx = ix-(sx-cw/2)/view.scale;
+  view.cy = iy-(sy-ch/2)/view.scale;
+  anim=null; draw();
+}, {passive:false});
+document.getElementById('zin').onclick = ()=>{ view.scale*=1.45; anim=null; draw(); };
+document.getElementById('zout').onclick = ()=>{ view.scale/=1.45; anim=null; draw(); };
+document.getElementById('zfit').onclick = ()=>flyTo(null);
+
+/* ---------- layers UI ---------- */
+const layersDiv = document.getElementById('layers');
+for (const k in layers){
+  const l = layers[k];
+  const lab = document.createElement('label'); lab.className='lay';
+  lab.innerHTML = `<input type="checkbox" ${l.on?'checked':''}><span class="sw" style="background:${l.sw}"></span><span>${l.name}</span>`;
+  lab.querySelector('input').addEventListener('change', e=>{ l.on=e.target.checked; draw(); });
+  layersDiv.appendChild(lab);
+  l.input = lab.querySelector('input');
+}
+const tslider = document.getElementById('tslider');
+tslider.addEventListener('input', ()=>{
+  thresholdM = +tslider.value;
+  document.getElementById('tval').textContent = thresholdM+" m";
+  renderLowland(); renderReach(); draw();
+});
+
+/* ---------- story ---------- */
+const stepsDiv = document.getElementById('steps');
+STEPS.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.textContent = (i+1)+"·"+s.t.split("：")[0].split("，")[0];
+  b.onclick=()=>setStep(i);
+  stepsDiv.appendChild(b);
+});
+let curStep = 0;
+function setStep(i, instant){
+  curStep = i;
+  [...stepsDiv.children].forEach((b,j)=>b.classList.toggle('on', j===i));
+  const s = STEPS[i];
+  document.getElementById('story').innerHTML = `<h3>${["壹","贰","叁","肆","伍","陆"][i]} · ${s.t}</h3>` + s.html;
+  for (const k in s.ly){ layers[k].on = !!s.ly[k]; layers[k].input.checked = !!s.ly[k]; }
+  document.getElementById('prev').disabled = i===0;
+  document.getElementById('next').textContent = i===STEPS.length-1 ? "回到开头 ↺" : "下一步 →";
+  if (s.view) flyTo(s.view[0], s.view[1], s.view[2], instant?0:1300);
+  else flyTo(null, null, null, instant?0:1300);
+  draw();
+  document.getElementById('panel').scrollTo({top:0, behavior: reduceMotion?'auto':'smooth'});
+}
+document.getElementById('prev').onclick=()=>setStep(Math.max(0,curStep-1));
+document.getElementById('next').onclick=()=>setStep((curStep+1)%STEPS.length);
+addEventListener('keydown', e=>{
+  const t = e.target;
+  if (t && /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(t.tagName)) return;
+  if (e.key==='ArrowRight') setStep((curStep+1)%STEPS.length);
+  if (e.key==='ArrowLeft') setStep(Math.max(0,curStep-1));
+});
+
+/* ---------- profile ---------- */
+const profile = {samples:null, line:null, hoverG:null, name:""};
+const picking = {on:false, a:null};
+const pfCv = document.getElementById('profchart');
+const pfBtns = [document.getElementById('pfA'),document.getElementById('pfB'),document.getElementById('pfC')];
+
+function sampleAlong(pts, n=420){
+  /* cumulative km along polyline; sample evenly */
+  const cum=[0];
+  for (let i=1;i<pts.length;i++) cum.push(cum[i-1]+havKm(pts[i-1],pts[i]));
+  const total=cum[cum.length-1];
+  const out=[];
+  for (let i=0;i<n;i++){
+    const d = total*i/(n-1);
+    let j=1; while (j<cum.length-1 && cum[j]<d) j++;
+    const t=(d-cum[j-1])/((cum[j]-cum[j-1])||1);
+    const lon=pts[j-1][0]+(pts[j][0]-pts[j-1][0])*t;
+    const lat=pts[j-1][1]+(pts[j][1]-pts[j-1][1])*t;
+    let [ix,iy]=geoToImg(lon,lat);
+    ix=Math.min(Math.max(ix,0),W-1.001); iy=Math.min(Math.max(iy,0),H-1.001);
+    let h=-9999;
+    if (ix>=0&&iy>=0&&ix<W-1&&iy<H-1){
+      const x0=ix|0,y0=iy|0,fx=ix-x0,fy=iy-y0;
+      h = heights[y0*W+x0]*(1-fx)*(1-fy)+heights[y0*W+x0+1]*fx*(1-fy)
+        + heights[(y0+1)*W+x0]*(1-fx)*fy+heights[(y0+1)*W+x0+1]*fx*fy;
+    }
+    out.push({d, h, g:[lon,lat]});
+  }
+  return {samples:out, total};
+}
+
+function runProfile(pts, name){
+  const {samples,total} = sampleAlong(pts);
+  if (!(total > 1)){
+    document.getElementById('profstats').innerHTML = "两点距离太近，请重新选择相距更远的两点。";
+    return;
+  }
+  profile.samples=samples; profile.total=total; profile.line=pts; profile.name=name; profile.hoverG=null;
+  const above = samples.filter(s=>s.h>500).length/samples.length;
+  const maxS = samples.reduce((a,b)=>b.h>a.h?b:a);
+  const sea = samples.filter(s=>s.h<=0).length/samples.length;
+  let stats = `<b>${name}</b> · 全程 <b>${Math.round(total)} km</b> · 最高 <b>${Math.round(maxS.h)} m</b>`;
+  stats += sea>0.02 ? ` · 海上 ${(sea*100).toFixed(0)}%` : ` · >500m 路段 ${(above*100).toFixed(0)}%`;
+  document.getElementById('profstats').innerHTML = stats;
+  drawProfile();
+  draw();
+}
+function drawProfile(hoverI=-1){
+  const w = pfCv.clientWidth||360, h = pfCv.clientHeight||150;
+  pfCv.width=w*dpr; pfCv.height=h*dpr;
+  const x = pfCv.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0);
+  x.clearRect(0,0,w,h);
+  const css = getComputedStyle(document.documentElement);
+  const ink2 = css.getPropertyValue('--ink-2').trim(), line = css.getPropertyValue('--line').trim();
+  const accent = css.getPropertyValue('--accent').trim(), indigo = css.getPropertyValue('--indigo').trim();
+  if (!profile.samples){
+    x.fillStyle=ink2; x.font='12px -apple-system,"PingFang SC",sans-serif'; x.textAlign='center';
+    x.fillText("尚无剖面", w/2, h/2); return;
+  }
+  const S=profile.samples, ml=40, mr=10, mt=12, mb=20;
+  const pw=w-ml-mr, ph=h-mt-mb;
+  const maxH = Math.max(600, Math.ceil(S.reduce((a,b)=>Math.max(a,b.h),0)/500)*500);
+  const minH = Math.min(0, S.reduce((a,b)=>Math.min(a,b.h),0));
+  const X=d=>ml+d/profile.total*pw, Y=hh=>mt+ (maxH-hh)/(maxH-minH)*ph;
+  /* grid */
+  x.strokeStyle=line; x.lineWidth=1; x.fillStyle=ink2;
+  x.font='10px -apple-system,sans-serif'; x.textAlign='right'; x.textBaseline='middle';
+  for (let g=0; g<=maxH; g+=maxH>1500?1000:500){
+    x.globalAlpha=.6; x.beginPath(); x.moveTo(ml,Y(g)); x.lineTo(w-mr,Y(g)); x.stroke(); x.globalAlpha=1;
+    x.fillText(g, ml-5, Y(g));
+  }
+  x.textAlign='center'; x.textBaseline='top';
+  const kmStep = profile.total>900?300:100;
+  for (let d=0; d<=profile.total; d+=kmStep) x.fillText(d+"", X(d), h-mb+4);
+  x.fillText("km", w-mr-8, h-mb+4);
+  /* sea */
+  x.fillStyle = indigo; x.globalAlpha=.5;
+  x.beginPath(); let inSea=false;
+  for (const p of S){
+    if (p.h<=0 && !inSea){ x.moveTo(X(p.d), Y(0)); inSea=true; }
+    if (inSea){ x.lineTo(X(p.d), Y(Math.max(p.h,minH))); }
+    if (p.h>0 && inSea){ x.lineTo(X(p.d), Y(0)); inSea=false; }
+  }
+  if (inSea) x.lineTo(X(S[S.length-1].d), Y(0));
+  x.closePath(); x.fill(); x.globalAlpha=1;
+  /* land area */
+  x.beginPath(); x.moveTo(X(0), Y(Math.max(S[0].h,0)));
+  for (const p of S) x.lineTo(X(p.d), Y(Math.max(p.h,0)));
+  x.lineTo(X(profile.total), Y(0)); x.lineTo(X(0), Y(0)); x.closePath();
+  const grd = x.createLinearGradient(0,mt,0,Y(0));
+  grd.addColorStop(0, accent+"cc"); grd.addColorStop(1, accent+"22");
+  x.fillStyle=grd; x.fill();
+  x.strokeStyle=accent; x.lineWidth=1.6;
+  x.beginPath();
+  for (let i=0;i<S.length;i++){ const p=S[i]; i?x.lineTo(X(p.d),Y(p.h)):x.moveTo(X(p.d),Y(p.h)); }
+  x.stroke();
+  /* zero line */
+  x.strokeStyle=ink2; x.globalAlpha=.7; x.beginPath(); x.moveTo(ml,Y(0)); x.lineTo(w-mr,Y(0)); x.stroke(); x.globalAlpha=1;
+  /* max marker */
+  const maxP = S.reduce((a,b)=>b.h>a.h?b:a);
+  x.fillStyle=accent; x.beginPath(); x.arc(X(maxP.d),Y(maxP.h),3,0,7); x.fill();
+  x.textAlign = X(maxP.d)>w-70?'right':'left'; x.textBaseline='bottom';
+  x.font='600 10.5px -apple-system,sans-serif';
+  x.fillText(` ${Math.round(maxP.h)} m `, X(maxP.d), Y(maxP.h)-3);
+  /* hover */
+  if (hoverI>=0){
+    const p=S[hoverI];
+    x.strokeStyle=ink2; x.setLineDash([3,3]);
+    x.beginPath(); x.moveTo(X(p.d),mt); x.lineTo(X(p.d),h-mb); x.stroke(); x.setLineDash([]);
+    x.fillStyle=accent; x.beginPath(); x.arc(X(p.d),Y(Math.max(p.h,minH)),3.5,0,7); x.fill();
+    x.textAlign = X(p.d)>w-90?'right':'left'; x.textBaseline='top';
+    x.fillStyle = css.getPropertyValue('--ink').trim();
+    x.font='10.5px -apple-system,sans-serif';
+    x.fillText(` ${Math.round(p.d)} km · ${p.h>0?Math.round(p.h)+" m":"海"}`, X(p.d), mt);
+    profile.hoverG = p.g; draw();
+  } else if (profile.hoverG){ profile.hoverG=null; draw(); }
+}
+pfCv.addEventListener('mousemove', e=>{
+  if (!profile.samples) return;
+  const r=pfCv.getBoundingClientRect();
+  const d=(e.clientX-r.left-40)/(r.width-50)*profile.total;
+  let best=0,bd=1e18;
+  profile.samples.forEach((p,i)=>{ const dd=Math.abs(p.d-d); if(dd<bd){bd=dd;best=i;} });
+  drawProfile(best);
+});
+pfCv.addEventListener('mouseleave', ()=>drawProfile());
+
+function selectBtn(i){ pfBtns.forEach((b,j)=>b.classList.toggle('on', i===j)); }
+pfBtns[0].onclick=()=>{ selectBtn(0); picking.on=false; ovlCv.classList.remove('pick');
+  runProfile([[112.45,34.62],[113.90,35.25],[115.05,35.72],[116.25,36.28],[117.05,36.75],[118.31,36.83]], "洛阳→临淄（驿路）"); };
+pfBtns[1].onclick=()=>{ selectBtn(1); picking.on=false; ovlCv.classList.remove('pick');
+  runProfile([...R_SUI.pts.slice(3), ...R_YALU.pts.slice(1)], "蓟→平壤(陆路)"); };
+pfBtns[2].onclick=()=>{ selectBtn(2); picking.on=true; picking.a=null; ovlCv.classList.add('pick');
+  document.getElementById('profstats').innerHTML="在地图上点击两点（甲、乙）生成剖面。"; };
+
+new ResizeObserver(()=>{ legend(); if(profile.samples) drawProfile(); }).observe(document.getElementById('panel'));
+const themeWatch = ()=>{ draw(); if (profile.samples) drawProfile(); };
+new MutationObserver(themeWatch).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeWatch);
+</script>

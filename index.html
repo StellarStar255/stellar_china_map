@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>山河舆图 · 交互地形图系列</title>
+<style>
+:root{
+  --bg:#14171d; --panel:#1d222b; --ink:#eae4d6; --ink-2:#a89e8e; --ink-3:#7a7264;
+  --line:#333a46; --accent:#d05a35; --gold:#d4a94f;
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#ece5d4; --panel:#f7f2e6; --ink:#2b251b; --ink-2:#6d6350; --ink-3:#988c74;
+    --line:#d6cbb4; --accent:#a83a1e; --gold:#9b7826; }
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  display:flex;align-items:center;justify-content:center;padding:32px 20px}
+.wrap{max-width:760px;width:100%}
+header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.seal{width:44px;height:44px;border-radius:8px;background:var(--accent);color:#f5ead9;
+  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;
+  font-family:"Songti SC","Noto Serif SC",serif;
+  box-shadow:inset 0 0 0 2.5px rgba(245,234,217,.55), inset 0 0 0 4.5px var(--accent)}
+h1{font-size:26px;margin:0;letter-spacing:.08em;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+.sub{color:var(--ink-2);font-size:14px;margin:0 0 28px 58px;letter-spacing:.02em}
+a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:16px;
+  transition:transform .15s ease, border-color .15s ease}
+a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card h2{margin:0 0 6px;font-size:19px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;letter-spacing:.04em}
+.card h2 em{font-style:normal;color:var(--accent)}
+.card p{margin:0;color:var(--ink-2);font-size:13.5px;line-height:1.8}
+.card .tag{float:right;font-size:11px;color:var(--gold);border:1px solid currentColor;
+  border-radius:99px;padding:2px 10px;margin-top:2px;letter-spacing:.1em}
+footer{margin-top:22px;color:var(--ink-3);font-size:11.5px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="seal">舆</div><h1>山河舆图</h1></header>
+  <p class="sub">用真实地形数据讲中国历史地理的交互图系列</p>
+
+  <a class="card" href="山河之限_中国山东与朝鲜地形交互图.html">
+    <span class="tag">壹</span>
+    <h2>山河之限 <em>· 为什么中国吞得下山东，却吞不下朝鲜</em></h2>
+    <p>华北平原的连续低地 vs 辽西走廊—辽泽—鸭绿江—盖马高原的层层瓶颈。六步讲解、隋唐征高句丽路线、洛阳可达区洪泛分析、地形剖面。</p>
+  </a>
+
+  <a class="card" href="百二秦关_秦并六国战略地形交互图.html">
+    <span class="tag">贰</span>
+    <h2>百二秦关 <em>· 为什么吞并六国的是秦</em></h2>
+    <p>关中四塞与巴蜀粮仓的「带门的房间」 vs 中原「没门的大厅」。七国疆域示意、远交近攻、灭六国路线、咸阳/大梁双源点可达区对比。</p>
+  </a>
+
+  <footer>
+    本地启动：双击 start_server.command，或在本目录运行 <code>python3 -m http.server 8471</code> 后访问
+    <code>http://localhost:8471</code> ·
+    地形数据 Mapzen/AWS Terrain Tiles · 边界与河流 Natural Earth
+  </footer>
+</div>
+</body>
+</html>
